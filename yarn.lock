@@ -4762,6 +4762,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lucide-vue-next@npm:^0.575.0":
+  version: 0.575.0
+  resolution: "lucide-vue-next@npm:0.575.0"
+  peerDependencies:
+    vue: ">=3.0.1"
+  checksum: 10c0/6862ae20d1449e99ab8a1de27caa1460edeaabe1dc26f2ccdcdaec20bdd594e9ccb523942a198d5bac199c98f0a9faee16ab7260d9bcf68a750b52768b190c3c
+  languageName: node
+  linkType: hard
+
 "magic-regexp@npm:^0.10.0":
   version: 0.10.0
   resolution: "magic-regexp@npm:0.10.0"
@@ -7081,6 +7090,7 @@ __metadata:
     "@pinia/nuxt": "npm:^0.11.3"
     "@tailwindcss/vite": "npm:^4.2.1"
     autoprefixer: "npm:^10.4.27"
+    lucide-vue-next: "npm:^0.575.0"
     nuxt: "npm:^4.3.1"
     pinia: "npm:^3.0.4"
     postcss: "npm:^8.5.6"
