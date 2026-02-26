@@ -1,5 +1,38 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from '@tailwindcss/vite'
+
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
-  devtools: { enabled: true }
+  compatibilityDate: '2024-04-03',
+  devtools: { enabled: true },
+
+  modules: [
+    '@pinia/nuxt'
+  ],
+
+  css: ['~/assets/css/main.css'],
+
+  vite: {
+    plugins: [
+      tailwindcss() as any,
+    ],
+  },
+
+  nitro: {
+    devProxy: {
+      '/api': {
+        target: 'http://localhost:8080/api',
+        changeOrigin: true,
+        prependPath: true
+      }
+    }
+  },
+
+  app: {
+    head: {
+      title: 'TimeTracker Widget',
+      meta: [
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' }
+      ]
+    }
+  }
 })
