@@ -1,41 +1,66 @@
 export const translations = {
-    pt: {
-        title: 'AP101 Tracker',
-        loading: 'Iniciando...',
-        authError: 'Falha na autenticação do Widget.',
-        configError: 'Configuração não encontrada.',
-        status: {
-            idle: 'Disponível',
-            working: 'Em Trabalho',
-            paused: 'Em Pausa',
-            finished: 'Finalizado'
-        },
-        actions: {
-            start: 'Registrar Entrada',
-            pause: 'Iniciar Pausa',
-            resume: 'Voltar ao Trabalho',
-            exit: 'Encerrar Expediente',
-            openPanel: 'Abrir Painel de Jornada',
-            closePanel: 'Fechar Painel'
+    'pt-BR': {
+        login: {
+            title: 'AP101 TimeTracker',
+            subtitle: 'Gestão de Ponto e Jornada',
+            emailLabel: 'Email',
+            emailPlaceholder: 'seu@email.com',
+            passwordLabel: 'Senha',
+            passwordPlaceholder: '••••••••',
+            submitButton: 'Entrar',
+            invalidCredentials: 'Email ou senha incorretos.',
+            language: 'English',
+            firstAccessText: 'Primeiro acesso ou esqueceu a senha?',
+            firstAccessAction: 'Criar senha',
+            backToLogin: 'Voltar ao login',
+            requestCodeTitle: 'Primeiro Acesso',
+            requestCodeSubtitle: 'Informe seu e-mail corporativo para receber o código de acesso.',
+            requestCodeButton: 'Enviar Código',
+            codeSentError: 'Erro ao enviar o código. Verifique seu e-mail.',
+            setPasswordTitle: 'Definir Senha',
+            setPasswordSubtitle: 'Digite o código recebido e crie sua nova senha.',
+            codeLabel: 'Código de Acesso',
+            codePlaceholder: '000000',
+            newPasswordLabel: 'Nova Senha',
+            setPasswordButton: 'Salvar e Entrar',
+            setPasswordError: 'Código inválido ou expirado.'
         },
         dashboard: {
-            title: 'Painel de Jornada',
-            workToday: 'Trabalho (Hoje)',
-            pauseTotal: 'Pausas (Total)',
-            weekSummary: 'Resumo da Semana',
-            timeline: 'Linha do Tempo (Hoje)',
-            emptyTimeline: 'Nenhum registro ainda hoje.',
-            liquidHours: '* Horas líquidas trabalhadas',
-            filter: 'Filtrar'
+            title: 'Dashboard',
+            logout: 'Sair',
+            emptyState: 'O conteúdo da gestão e o relógio do colaborador entrarão aqui.'
+        }
+    },
+    'en': {
+        login: {
+            title: 'AP101 TimeTracker',
+            subtitle: 'Time and Attendance Management',
+            emailLabel: 'Email',
+            emailPlaceholder: 'your@email.com',
+            passwordLabel: 'Password',
+            passwordPlaceholder: '••••••••',
+            submitButton: 'Sign In',
+            invalidCredentials: 'Invalid email or password.',
+            language: 'Português',
+            firstAccessText: 'First access or forgot password?',
+            firstAccessAction: 'Create password',
+            backToLogin: 'Back to login',
+            requestCodeTitle: 'First Access',
+            requestCodeSubtitle: 'Enter your corporate email to receive an access code.',
+            requestCodeButton: 'Send Code',
+            codeSentError: 'Error sending code. Check your email.',
+            setPasswordTitle: 'Set Password',
+            setPasswordSubtitle: 'Enter the received code and create your new password.',
+            codeLabel: 'Access Code',
+            codePlaceholder: '000000',
+            newPasswordLabel: 'New Password',
+            setPasswordButton: 'Save and Sign In',
+            setPasswordError: 'Invalid or expired code.'
         },
-        days: {
-            Dom: 'Dom', Seg: 'Seg', Ter: 'Ter', Qua: 'Qua', Qui: 'Qui', Sex: 'Sex', Sab: 'Sáb'
-        },
-        history: {
-            ENTRY: 'Entrada',
-            PAUSE_START: 'Início Pausa',
-            PAUSE_END: 'Fim Pausa',
-            EXIT: 'Saída'
+        dashboard: {
+            title: 'Dashboard',
+            logout: 'Sign Out',
+            emptyState: 'Management content and the employee clock will appear here.'
         }
     }
 }

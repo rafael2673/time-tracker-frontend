@@ -18,7 +18,7 @@ export default defineNuxtConfig({
   nitro: {
     devProxy: {
       '/api': {
-        target: 'http://localhost:8080/api',
+        target: 'http://localhost:8081/api',
         changeOrigin: true,
         prependPath: true
       }
@@ -27,7 +27,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: 'TimeTracker Widget',
+      title: 'TimeTracker',
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1' }
       ]

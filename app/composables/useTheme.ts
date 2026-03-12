@@ -1,10 +1,7 @@
+import { useState } from '#app'
+
 export const useTheme = () => {
     const isDark = useState('theme', () => false)
-
-    const toggleTheme = () => {
-        isDark.value = !isDark.value
-        updateDOM()
-    }
 
     const updateDOM = () => {
         if (typeof document === 'undefined') return
@@ -17,6 +14,11 @@ export const useTheme = () => {
             html.classList.remove('dark')
             localStorage.setItem('theme', 'light')
         }
+    }
+
+    const toggleTheme = () => {
+        isDark.value = !isDark.value
+        updateDOM()
     }
 
     const initTheme = () => {
