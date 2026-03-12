@@ -1,15 +1,28 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { api } from '../utils/api'
 
 interface AuthResponse {
     accessToken?: string
     token?: string
 }
 
+interface UserProfile {
+    id: string
+    fullName: string
+    email: string
+    role: string
+    workspaceId: string
+    workspaceName: string
+}
+
 export const useAuthStore = defineStore('auth', () => {
     const token = ref<string | null>(null)
     const isAuthenticated = ref<boolean>(false)
+    const user = ref<UserProfile | null>(null)
+    const activeWorkspaceId = ref<string | null>(null)
+
     const router = useRouter()
 
     function setToken(newToken: string | null): void {
@@ -20,6 +33,20 @@ export const useAuthStore = defineStore('auth', () => {
             localStorage.setItem('tt_token', newToken)
         } else {
             localStorage.removeItem('tt_token')
+        }
+    }
+
+    function setActiveWorkspace(workspaceId: string): void {
+        activeWorkspaceId.value = workspaceId
+        localStorage.setItem('tt_workspace', workspaceId)
+    }
+
+    async function fetchProfile(): Promise<void> {
+        try {
+            // Em breve criaremos a rota /api/v1/users/me no backend para popular isso
+            // user.value = await api<UserProfile>('/api/v1/users/me')
+        } catch (error) {
+            console.error('Failed to fetch profile', error)
         }
     }
 
@@ -34,9 +61,9 @@ export const useAuthStore = defineStore('auth', () => {
 
             if (validToken) {
                 setToken(validToken)
+                await fetchProfile()
                 return true
             }
-
             return false
         } catch (error: unknown) {
             return false
@@ -66,9 +93,9 @@ export const useAuthStore = defineStore('auth', () => {
 
             if (validToken) {
                 setToken(validToken)
+                await fetchProfile()
                 return true
             }
-
             return false
         } catch (error: unknown) {
             return false
@@ -77,20 +104,32 @@ export const useAuthStore = defineStore('auth', () => {
 
     function initAuth(): void {
         const savedToken = localStorage.getItem('tt_token')
+        const savedWorkspace = localStorage.getItem('tt_workspace')
+
         if (savedToken) {
             setToken(savedToken)
+            if (savedWorkspace) {
+                setActiveWorkspace(savedWorkspace)
+            }
+            fetchProfile()
         }
     }
 
     function logout(): void {
         setToken(null)
+        user.value = null
+        activeWorkspaceId.value = null
+        localStorage.removeItem('tt_workspace')
         router.push('/login')
     }
 
     return {
         token,
         isAuthenticated,
+        user,
+        activeWorkspaceId,
         setToken,
+        setActiveWorkspace,
         login,
         requestFirstAccess,
         setFirstPassword,

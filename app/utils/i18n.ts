@@ -29,6 +29,29 @@ export const translations = {
             title: 'Dashboard',
             logout: 'Sair',
             emptyState: 'O conteúdo da gestão e o relógio do colaborador entrarão aqui.'
+        },
+        policies: {
+            title: 'Políticas de Trabalho',
+            newPolicy: 'Nova Política',
+            editPolicy: 'Editar Política',
+            nameLabel: 'Nome da Política',
+            namePlaceholder: 'Ex: Administrativo 40h',
+            dailyLimitLabel: 'Carga Horária Diária (HH:mm)',
+            toleranceLabel: 'Tolerância (Minutos)',
+            workingDaysLabel: 'Dias da Semana',
+            save: 'Salvar',
+            cancel: 'Cancelar',
+            empty: 'Nenhuma política cadastrada neste workspace.',
+            errorSave: 'Erro ao salvar a política. Verifique os dados.',
+            days: {
+                MONDAY: 'Seg',
+                TUESDAY: 'Ter',
+                WEDNESDAY: 'Qua',
+                THURSDAY: 'Qui',
+                FRIDAY: 'Sex',
+                SATURDAY: 'Sáb',
+                SUNDAY: 'Dom'
+            }
         }
     },
     'en': {
@@ -61,6 +84,29 @@ export const translations = {
             title: 'Dashboard',
             logout: 'Sign Out',
             emptyState: 'Management content and the employee clock will appear here.'
+        },
+        policies: {
+            title: 'Work Policies',
+            newPolicy: 'New Policy',
+            editPolicy: 'Edit Policy',
+            nameLabel: 'Policy Name',
+            namePlaceholder: 'Ex: Admin 40h',
+            dailyLimitLabel: 'Daily Limit (HH:mm)',
+            toleranceLabel: 'Tolerance (Minutes)',
+            workingDaysLabel: 'Working Days',
+            save: 'Save',
+            cancel: 'Cancel',
+            empty: 'No policies registered in this workspace.',
+            errorSave: 'Error saving policy. Check the inputs.',
+            days: {
+                MONDAY: 'Mon',
+                TUESDAY: 'Tue',
+                WEDNESDAY: 'Wed',
+                THURSDAY: 'Thu',
+                FRIDAY: 'Fri',
+                SATURDAY: 'Sat',
+                SUNDAY: 'Sun'
+            }
         }
     }
 }
