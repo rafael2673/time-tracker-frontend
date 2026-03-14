@@ -116,18 +116,20 @@ function getRoleTranslation(role: string): string {
       </div>
 
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <div v-for="member in employeesStore.members" :key="member.id" @click="props.onSelectEmployee(member.id)" class="p-5 bg-gray-50 dark:bg-gray-800/30 rounded-3xl border border-gray-100 dark:border-gray-800 hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-md transition-all cursor-pointer group relative overflow-hidden">
-          <div class="flex items-center justify-between mb-4">
+        <div v-for="member in employeesStore.members" :key="member.id" @click="props.onSelectEmployee(member.id)" class="p-5 bg-gray-50 dark:bg-gray-800/30 rounded-3xl border border-gray-100 dark:border-gray-800 hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-md transition-all cursor-pointer group flex flex-col h-full overflow-hidden">
+          <div class="flex items-start justify-between mb-4 gap-3">
             <div class="w-12 h-12 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center font-bold text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors shadow-sm text-base shrink-0">
               {{ getInitials(member.fullName) }}
             </div>
-            <span class="px-2 py-1 bg-gray-200/50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 text-[10px] font-bold rounded-lg uppercase tracking-widest truncate max-w-[50%]">
-              {{ getRoleTranslation(member.role) }}
-            </span>
+            <div class="flex-1 min-w-0 flex justify-end">
+              <span class="px-2 py-1 bg-gray-200/50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 text-[10px] font-bold rounded-lg uppercase tracking-widest truncate max-w-full" :title="getRoleTranslation(member.role)">
+                {{ getRoleTranslation(member.role) }}
+              </span>
+            </div>
           </div>
-          <div class="space-y-1">
-            <p class="font-bold text-gray-900 dark:text-white truncate w-full" :title="member.fullName">{{ member.fullName }}</p>
-            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 truncate w-full" :title="member.workPolicyName">{{ member.workPolicyName }}</p>
+          <div class="space-y-1 mt-auto">
+            <p class="font-bold text-gray-900 dark:text-white truncate w-full block" :title="member.fullName">{{ member.fullName }}</p>
+            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 truncate w-full block" :title="member.workPolicyName">{{ member.workPolicyName }}</p>
           </div>
         </div>
       </div>
