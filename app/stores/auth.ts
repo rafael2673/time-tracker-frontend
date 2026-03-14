@@ -117,7 +117,7 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
-    function initAuth(): void {
+    async function initAuth(): Promise<void> {
         const savedToken = localStorage.getItem('tt_token')
         const savedWorkspace = localStorage.getItem('tt_workspace')
 
@@ -126,16 +126,16 @@ export const useAuthStore = defineStore('auth', () => {
             if (savedWorkspace) {
                 setActiveWorkspace(savedWorkspace)
             }
-            fetchProfile()
+            await fetchProfile()
         }
     }
 
-    function logout(): void {
+    async function logout(): Promise<void> {
         setToken(null)
         user.value = null
         activeWorkspaceId.value = null
         localStorage.removeItem('tt_workspace')
-        router.push('/login')
+        await router.push('/login')
     }
 
     return {

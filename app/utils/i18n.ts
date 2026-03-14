@@ -39,7 +39,12 @@ export const translations = {
             noEmployees: 'Nenhum colaborador adicionado ainda.',
             manager: 'Gestor',
             backToCompany: 'Voltar para a Empresa',
-            employeeTimeSheetPlaceholder: 'Espaço reservado para o extrato de ponto do colaborador.'
+            employeeTimeSheetPlaceholder: 'Espaço reservado para o extrato de ponto do colaborador.',
+            punchError: 'Erro ao registrar o ponto.',
+            registerPunch: 'Registrar Ponto',
+            punchRestriction: 'Apenas colaboradores podem registrar ponto.',
+            todayRecords: 'Registros de Hoje',
+            noRecordsToday: 'Nenhum registro efetuado hoje.'
         },
         navigation: {
             dashboard: 'Dashboard',
@@ -155,7 +160,12 @@ export const translations = {
             noEmployees: 'No employees added yet.',
             manager: 'Manager',
             backToCompany: 'Back to Company',
-            employeeTimeSheetPlaceholder: 'Placeholder for the employee\'s time sheet.'
+            employeeTimeSheetPlaceholder: 'Placeholder for the employee\'s time sheet.',
+            punchError: 'Error registering punch.',
+            registerPunch: 'Register Punch',
+            punchRestriction: 'Only employees can register a punch.',
+            todayRecords: 'Today\'s Records',
+            noRecordsToday: 'No records today.'
         },
         navigation: {
             dashboard: 'Dashboard',

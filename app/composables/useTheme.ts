@@ -27,11 +27,7 @@ export const useTheme = () => {
         const savedTheme = localStorage.getItem('theme')
         const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
 
-        if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
-            isDark.value = true
-        } else {
-            isDark.value = false
-        }
+        isDark.value = savedTheme === 'dark' || (!savedTheme && systemDark)
         updateDOM()
     }
 
