@@ -108,6 +108,17 @@ export const translations = {
                 ADMIN: 'Administrador',
                 MANAGER: 'Gestor (RH)',
                 EMPLOYEE: 'Colaborador'
+            },
+            dashboard: {
+                graphics: 'Gráficos de jornada e detalhamentos serão exibidos aqui.'
+            }
+        },
+        chart: {
+            evolution: {
+                year: 'Evolução Anual'
+            },
+            current: {
+                week: 'Semana Atual'
             }
         },
         settings: {
@@ -234,6 +245,17 @@ export const translations = {
                 ADMIN: 'Administrator',
                 MANAGER: 'Manager (HR)',
                 EMPLOYEE: 'Employee'
+            },
+            dashboard: {
+                graphics: 'Journey charts and breakdowns will be displayed here.'
+            }
+        },
+        chart: {
+            evolution: {
+                year: 'Annual Evolution'
+            },
+            current: {
+                week: 'Current Week'
             }
         },
         settings: {

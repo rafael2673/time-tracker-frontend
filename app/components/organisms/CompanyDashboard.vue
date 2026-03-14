@@ -7,6 +7,7 @@ import { useEmployeesStore } from '~/stores/employees'
 import { usePoliciesStore } from '~/stores/policies'
 import { useSummaryStore } from '~/stores/summary'
 import { useLocale } from '~/composables/useLocale'
+import { formatDecimalHours } from '~/utils/timeFormatter'
 
 const props = defineProps<{
   onSelectEmployee: (id: string) => void
@@ -87,7 +88,7 @@ function getRoleTranslation(role: string): string {
         </div>
         <div>
           <h3 class="text-3xl font-bold tabular-nums" :class="summaryStore.monthlyBalance?.balance && summaryStore.monthlyBalance.balance < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'">
-            {{ summaryStore.monthlyBalance ? summaryStore.monthlyBalance.balance + 'h' : '--h' }}
+            {{ summaryStore.monthlyBalance ? formatDecimalHours(summaryStore.monthlyBalance.balance) : '--h' }}
           </h3>
           <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{{ t.dashboard.hourBalance }}</p>
         </div>
