@@ -44,7 +44,12 @@ export const translations = {
             registerPunch: 'Registrar Ponto',
             punchRestriction: 'Apenas colaboradores podem registrar ponto.',
             todayRecords: 'Registros de Hoje',
-            noRecordsToday: 'Nenhum registro efetuado hoje.'
+            noRecordsToday: 'Nenhum registro efetuado hoje.',
+            workedHours: 'Horas Trabalhadas',
+            hourBalance: 'Saldo de Horas',
+            pendingJustifications: 'Justificativas Pendentes',
+            workloadSummary: 'Resumo da Jornada',
+            acceptedJustifications: 'Justificativas Aceitas'
         },
         navigation: {
             dashboard: 'Dashboard',
@@ -165,7 +170,12 @@ export const translations = {
             registerPunch: 'Register Punch',
             punchRestriction: 'Only employees can register a punch.',
             todayRecords: 'Today\'s Records',
-            noRecordsToday: 'No records today.'
+            noRecordsToday: 'No records today.',
+            workedHours: 'Worked Hours',
+            hourBalance: 'Hour Balance',
+            pendingJustifications: 'Pending Justifications',
+            workloadSummary: 'Workload Summary',
+            acceptedJustifications: 'Accepted Justifications'
         },
         navigation: {
             dashboard: 'Dashboard',
