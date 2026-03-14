@@ -28,7 +28,16 @@ export const translations = {
         dashboard: {
             title: 'Dashboard',
             logout: 'Sair',
-            emptyState: 'O conteúdo da gestão e o relógio do colaborador entrarão aqui.'
+            emptyState: 'O conteúdo da gestão e o relógio do colaborador entrarão aqui.',
+            hello: 'Olá',
+            overview: 'Visão geral da empresa',
+            employees: 'Colaboradores',
+            policies: 'Políticas de Trabalho',
+            extraHours: 'Horas Extras no Mês',
+            pending: 'Pontos Pendentes',
+            latestEmployees: 'Últimos Colaboradores',
+            viewAll: 'Ver todos',
+            noEmployees: 'Nenhum colaborador adicionado ainda.'
         },
         policies: {
             title: 'Políticas de Trabalho',
@@ -43,6 +52,10 @@ export const translations = {
             cancel: 'Cancelar',
             empty: 'Nenhuma política cadastrada neste workspace.',
             errorSave: 'Erro ao salvar a política. Verifique os dados.',
+            successAdd: 'Política criada com sucesso!',
+            successEdit: 'Política atualizada com sucesso!',
+            successDelete: 'Política excluída com sucesso!',
+            confirmDelete: 'Tem certeza que deseja excluir esta política?',
             days: {
                 MONDAY: 'Seg',
                 TUESDAY: 'Ter',
@@ -52,6 +65,37 @@ export const translations = {
                 SATURDAY: 'Sáb',
                 SUNDAY: 'Dom'
             }
+        },
+        employees: {
+            title: 'Colaboradores',
+            newEmployee: 'Novo Colaborador',
+            name: 'Nome',
+            email: 'Email',
+            role: 'Cargo',
+            policy: 'Política de Trabalho',
+            save: 'Adicionar',
+            cancel: 'Cancelar',
+            empty: 'Nenhum colaborador encontrado.',
+            errorSave: 'Erro ao adicionar colaborador.',
+            successAdd: 'Colaborador adicionado com sucesso!',
+            roles: {
+                ADMIN: 'Administrador',
+                MANAGER: 'Gestor (RH)',
+                EMPLOYEE: 'Colaborador'
+            }
+        },
+        settings: {
+            title: 'Configurações',
+            profile: 'Meu Perfil',
+            nameLabel: 'Nome Completo',
+            emailLabel: 'E-mail de Acesso',
+            recoveryEmailLabel: 'E-mail de Recuperação',
+            save: 'Salvar Alterações',
+            success: 'Perfil atualizado com sucesso!',
+            error: 'Erro ao atualizar o perfil.'
+        },
+        workspaces: {
+            selectorPlaceholder: 'Selecione a Empresa'
         }
     },
     'en': {
@@ -83,7 +127,16 @@ export const translations = {
         dashboard: {
             title: 'Dashboard',
             logout: 'Sign Out',
-            emptyState: 'Management content and the employee clock will appear here.'
+            emptyState: 'Management content and the employee clock will appear here.',
+            hello: 'Hello',
+            overview: 'Workspace overview for',
+            employees: 'Employees',
+            policies: 'Work Policies',
+            extraHours: 'Extra Hours (Month)',
+            pending: 'Pending Records',
+            latestEmployees: 'Latest Employees',
+            viewAll: 'View all',
+            noEmployees: 'No employees added yet.'
         },
         policies: {
             title: 'Work Policies',
@@ -98,6 +151,10 @@ export const translations = {
             cancel: 'Cancel',
             empty: 'No policies registered in this workspace.',
             errorSave: 'Error saving policy. Check the inputs.',
+            successAdd: 'Policy created successfully!',
+            successEdit: 'Policy updated successfully!',
+            successDelete: 'Policy deleted successfully!',
+            confirmDelete: 'Are you sure you want to delete this policy?',
             days: {
                 MONDAY: 'Mon',
                 TUESDAY: 'Tue',
@@ -107,6 +164,37 @@ export const translations = {
                 SATURDAY: 'Sat',
                 SUNDAY: 'Sun'
             }
+        },
+        employees: {
+            title: 'Employees',
+            newEmployee: 'New Employee',
+            name: 'Name',
+            email: 'Email',
+            role: 'Role',
+            policy: 'Work Policy',
+            save: 'Add',
+            cancel: 'Cancel',
+            empty: 'No employees found.',
+            errorSave: 'Error adding employee.',
+            successAdd: 'Employee added successfully!',
+            roles: {
+                ADMIN: 'Administrator',
+                MANAGER: 'Manager (HR)',
+                EMPLOYEE: 'Employee'
+            }
+        },
+        settings: {
+            title: 'Settings',
+            profile: 'My Profile',
+            nameLabel: 'Full Name',
+            emailLabel: 'Access Email',
+            recoveryEmailLabel: 'Recovery Email',
+            save: 'Save Changes',
+            success: 'Profile updated successfully!',
+            error: 'Error updating profile.'
+        },
+        workspaces: {
+            selectorPlaceholder: 'Select Workspace'
         }
     }
 }

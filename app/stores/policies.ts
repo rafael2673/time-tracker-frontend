@@ -60,11 +60,23 @@ export const usePoliciesStore = defineStore('policies', () => {
         }
     }
 
+    async function deletePolicy(id: string): Promise<void> {
+        try {
+            await api(`/api/v1/work-policies/${id}`, {
+                method: 'DELETE'
+            })
+            policies.value = policies.value.filter(p => p.id !== id)
+        } catch (error: unknown) {
+            throw error
+        }
+    }
+
     return {
         policies,
         isLoading,
         fetchPolicies,
         createPolicy,
-        updatePolicy
+        updatePolicy,
+        deletePolicy
     }
 })

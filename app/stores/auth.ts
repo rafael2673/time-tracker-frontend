@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { api } from '../utils/api'
+import { api } from '~/utils/api'
 
 interface AuthResponse {
     accessToken?: string
@@ -47,6 +47,21 @@ export const useAuthStore = defineStore('auth', () => {
             // user.value = await api<UserProfile>('/api/v1/users/me')
         } catch (error) {
             console.error('Failed to fetch profile', error)
+        }
+    }
+
+    async function updateProfile(fullName: string, recoveryEmail: string): Promise<boolean> {
+        try {
+            await api('/api/v1/users/profile', {
+                method: 'PUT',
+                body: { fullName, recoveryEmail }
+            })
+            if (user.value) {
+                user.value.fullName = fullName
+            }
+            return true
+        } catch (error) {
+            return false
         }
     }
 
@@ -128,8 +143,8 @@ export const useAuthStore = defineStore('auth', () => {
         isAuthenticated,
         user,
         activeWorkspaceId,
-        setToken,
         setActiveWorkspace,
+        updateProfile,
         login,
         requestFirstAccess,
         setFirstPassword,

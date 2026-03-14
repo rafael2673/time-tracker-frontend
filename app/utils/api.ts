@@ -1,5 +1,3 @@
-import { useAuthStore } from '../stores/auth'
-
 export const api = async <T>(url: string, options: any = {}): Promise<T> => {
     const authStore = useAuthStore()
 
@@ -18,7 +16,9 @@ export const api = async <T>(url: string, options: any = {}): Promise<T> => {
             headers
         })
     } catch (error: any) {
-        if (error.response?.status === 401 || error.response?.status === 403) {
+        const statusCode = error.status || error.response?.status;
+
+        if (statusCode === 401 || statusCode === 403) {
             authStore.logout()
         }
         throw error

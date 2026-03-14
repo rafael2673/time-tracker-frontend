@@ -6,6 +6,10 @@ import { useTheme } from '~/composables/useTheme'
 import { useLocale } from '~/composables/useLocale'
 import { User, Lock, Eye, EyeOff, Moon, Sun, Loader2, Globe, KeyRound, ArrowLeft } from 'lucide-vue-next'
 
+definePageMeta({
+  layout: false
+})
+
 const viewState = ref<'LOGIN' | 'REQUEST_CODE' | 'SET_PASSWORD'>('LOGIN')
 
 const email = ref<string>('')
@@ -41,7 +45,7 @@ async function handleLogin(): Promise<void> {
   const success = await authStore.login(email.value, password.value)
 
   if (success) {
-    router.push('/')
+    await router.push('/')
   } else {
     errorMessage.value = t.value.login.invalidCredentials
   }
@@ -72,7 +76,7 @@ async function handleSetPassword(): Promise<void> {
   const success = await authStore.setFirstPassword(code.value, newPassword.value)
 
   if (success) {
-    router.push('/')
+    await router.push('/')
   } else {
     errorMessage.value = t.value.login.setPasswordError
   }
