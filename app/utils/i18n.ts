@@ -27,7 +27,6 @@ export const translations = {
         },
         dashboard: {
             title: 'Dashboard',
-            logout: 'Sair',
             emptyState: 'O conteúdo da gestão e o relógio do colaborador entrarão aqui.',
             hello: 'Olá',
             overview: 'Visão geral da empresa',
@@ -37,7 +36,22 @@ export const translations = {
             pending: 'Pontos Pendentes',
             latestEmployees: 'Últimos Colaboradores',
             viewAll: 'Ver todos',
-            noEmployees: 'Nenhum colaborador adicionado ainda.'
+            noEmployees: 'Nenhum colaborador adicionado ainda.',
+            manager: 'Gestor',
+            backToCompany: 'Voltar para a Empresa',
+            employeeTimeSheetPlaceholder: 'Espaço reservado para o extrato de ponto do colaborador.'
+        },
+        navigation: {
+            dashboard: 'Dashboard',
+            employees: 'Colaboradores',
+            policies: 'Políticas',
+            settings: 'Configurações',
+            logout: 'Sair'
+        },
+        modal: {
+            confirm: 'Confirmar',
+            cancel: 'Cancelar',
+            deletePolicyTitle: 'Excluir Política'
         },
         policies: {
             title: 'Políticas de Trabalho',
@@ -56,6 +70,8 @@ export const translations = {
             successEdit: 'Política atualizada com sucesso!',
             successDelete: 'Política excluída com sucesso!',
             confirmDelete: 'Tem certeza que deseja excluir esta política?',
+            dailyHours: 'h diárias',
+            toleranceMin: 'min de tolerância',
             days: {
                 MONDAY: 'Seg',
                 TUESDAY: 'Ter',
@@ -92,7 +108,8 @@ export const translations = {
             recoveryEmailLabel: 'E-mail de Recuperação',
             save: 'Salvar Alterações',
             success: 'Perfil atualizado com sucesso!',
-            error: 'Erro ao atualizar o perfil.'
+            error: 'Erro ao atualizar o perfil.',
+            noEmailLinked: 'Nenhum e-mail vinculado'
         },
         workspaces: {
             selectorPlaceholder: 'Selecione a Empresa'
@@ -126,7 +143,6 @@ export const translations = {
         },
         dashboard: {
             title: 'Dashboard',
-            logout: 'Sign Out',
             emptyState: 'Management content and the employee clock will appear here.',
             hello: 'Hello',
             overview: 'Workspace overview for',
@@ -136,7 +152,22 @@ export const translations = {
             pending: 'Pending Records',
             latestEmployees: 'Latest Employees',
             viewAll: 'View all',
-            noEmployees: 'No employees added yet.'
+            noEmployees: 'No employees added yet.',
+            manager: 'Manager',
+            backToCompany: 'Back to Company',
+            employeeTimeSheetPlaceholder: 'Placeholder for the employee\'s time sheet.'
+        },
+        navigation: {
+            dashboard: 'Dashboard',
+            employees: 'Employees',
+            policies: 'Policies',
+            settings: 'Settings',
+            logout: 'Sign Out'
+        },
+        modal: {
+            confirm: 'Confirm',
+            cancel: 'Cancel',
+            deletePolicyTitle: 'Delete Policy'
         },
         policies: {
             title: 'Work Policies',
@@ -155,6 +186,8 @@ export const translations = {
             successEdit: 'Policy updated successfully!',
             successDelete: 'Policy deleted successfully!',
             confirmDelete: 'Are you sure you want to delete this policy?',
+            dailyHours: 'h daily',
+            toleranceMin: 'min tolerance',
             days: {
                 MONDAY: 'Mon',
                 TUESDAY: 'Tue',
@@ -191,7 +224,8 @@ export const translations = {
             recoveryEmailLabel: 'Recovery Email',
             save: 'Save Changes',
             success: 'Profile updated successfully!',
-            error: 'Error updating profile.'
+            error: 'Error updating profile.',
+            noEmailLinked: 'No email linked'
         },
         workspaces: {
             selectorPlaceholder: 'Select Workspace'

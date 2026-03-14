@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { usePoliciesStore, type WorkPolicy, type WorkPolicyRequest } from '~/stores/policies'
 import { useLocale } from '~/composables/useLocale'
 import { Plus, Edit2, Trash2, Clock, CalendarDays, Loader2, AlertCircle } from 'lucide-vue-next'
+import ConfirmModal from '~/components/molecules/ConfirmModal.vue'
 
 const policiesStore = usePoliciesStore()
 const { t } = useLocale()
@@ -11,6 +12,10 @@ const isModalOpen = ref<boolean>(false)
 const isSubmitting = ref<boolean>(false)
 const errorMessage = ref<string>('')
 const pageSuccessMessage = ref<string>('')
+
+const showConfirmModal = ref<boolean>(false)
+const policyToDelete = ref<string | null>(null)
+const isDeleting = ref<boolean>(false)
 
 const editingId = ref<string | null>(null)
 const formData = ref({
@@ -72,14 +77,29 @@ function openEditModal(policy: WorkPolicy): void {
   isModalOpen.value = true
 }
 
-async function handleDelete(id: string): Promise<void> {
-  if (window.confirm(t.value.policies.confirmDelete)) {
-    try {
-      await policiesStore.deletePolicy(id)
-      showPageSuccess(t.value.policies.successDelete)
-    } catch (error: unknown) {
-      alert(t.value.policies.errorSave)
-    }
+function confirmDelete(id: string): void {
+  policyToDelete.value = id
+  showConfirmModal.value = true
+}
+
+function cancelDelete(): void {
+  showConfirmModal.value = false
+  policyToDelete.value = null
+}
+
+async function executeDelete(): Promise<void> {
+  if (!policyToDelete.value) return
+  isDeleting.value = true
+
+  try {
+    await policiesStore.deletePolicy(policyToDelete.value)
+    showPageSuccess(t.value.policies.successDelete)
+    showConfirmModal.value = false
+  } catch (error: unknown) {
+    showPageSuccess(t.value.policies.errorSave)
+  } finally {
+    isDeleting.value = false
+    policyToDelete.value = null
   }
 }
 
@@ -165,7 +185,7 @@ async function handleSubmit(): Promise<void> {
           <button @click="openEditModal(policy)" class="p-2 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 bg-gray-50 dark:bg-gray-800 rounded-xl cursor-pointer shadow-sm">
             <Edit2 :size="16" />
           </button>
-          <button @click="handleDelete(policy.id)" class="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 bg-gray-50 dark:bg-gray-800 rounded-xl cursor-pointer shadow-sm">
+          <button @click="confirmDelete(policy.id)" class="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 bg-gray-50 dark:bg-gray-800 rounded-xl cursor-pointer shadow-sm">
             <Trash2 :size="16" />
           </button>
         </div>
@@ -175,11 +195,11 @@ async function handleSubmit(): Promise<void> {
         <div class="space-y-4">
           <div class="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300 font-medium">
             <Clock :size="18" class="text-indigo-500" />
-            <span>{{ formatMinutesToTime(policy.dailyMinutesLimit) }}h diárias</span>
+            <span>{{ formatMinutesToTime(policy.dailyMinutesLimit) }}{{ t.policies.dailyHours }}</span>
           </div>
           <div class="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300 font-medium">
             <AlertCircle :size="18" class="text-amber-500" />
-            <span>{{ policy.toleranceMinutes }} min de tolerância</span>
+            <span>{{ policy.toleranceMinutes }} {{ t.policies.toleranceMin }}</span>
           </div>
           <div class="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300">
             <CalendarDays :size="18" class="text-emerald-500 shrink-0 mt-0.5" />
@@ -258,5 +278,14 @@ async function handleSubmit(): Promise<void> {
         </form>
       </div>
     </div>
+
+    <ConfirmModal
+        :show="showConfirmModal"
+        :title="t.modal.deletePolicyTitle"
+        :message="t.policies.confirmDelete"
+        :is-loading="isDeleting"
+        @confirm="executeDelete"
+        @cancel="cancelDelete"
+    />
   </div>
 </template>

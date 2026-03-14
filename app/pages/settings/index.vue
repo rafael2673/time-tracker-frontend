@@ -64,7 +64,7 @@ async function handleSubmit() {
           </label>
           <div class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-600 dark:text-gray-400 font-medium flex items-center gap-3">
             <Mail :size="16" />
-            {{ authStore.user?.email || 'Nenhum e-mail vinculado' }}
+            {{ authStore.user?.email || t.settings.noEmailLinked }}
           </div>
         </div>
 
