@@ -16,7 +16,7 @@ const isOpen = ref(false)
 const selectRef = ref<HTMLElement | null>(null)
 
 const selectedOption = computed(() => {
-  return props.options.find(opt => opt.value === props.modelValue)
+  return props.options.find(opt => String(opt.value) === String(props.modelValue))
 })
 
 const selectedLabel = computed(() => {
@@ -81,7 +81,7 @@ onUnmounted(() => {
               @click="selectOption(opt.value)"
               type="button"
               class="flex items-center w-full px-3 py-2.5 text-sm font-semibold rounded-lg transition-colors cursor-pointer"
-              :class="opt.value === props.modelValue ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
+              :class="String(opt.value) === String(props.modelValue) ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
           >
             <component v-if="opt.icon" :is="opt.icon" :size="16" class="mr-2 opacity-50 shrink-0" />
             <span class="truncate">{{ opt.label }}</span>

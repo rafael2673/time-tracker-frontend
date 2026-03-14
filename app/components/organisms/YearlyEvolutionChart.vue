@@ -61,7 +61,7 @@ const { t } = useLocale()
 
           <div
               class="absolute bottom-0 left-0 w-full rounded-t-md transition-all duration-500 ease-out z-10"
-              :class="month.hours >= month.expectedHours ? 'bg-emerald-500 dark:bg-emerald-600 group-hover:bg-emerald-400' : 'bg-indigo-500 dark:bg-indigo-600 group-hover:bg-indigo-400'"
+              :class="month.workedHours >= month.expectedHours ? 'bg-emerald-500 dark:bg-emerald-600 group-hover:bg-emerald-400' : 'bg-indigo-500 dark:bg-indigo-600 group-hover:bg-indigo-400'"
               :style="{ height: `${(month.workedHours / maxScaleHours) * 100}%` }"
           ></div>
 
