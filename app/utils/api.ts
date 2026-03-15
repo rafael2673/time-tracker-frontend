@@ -1,7 +1,7 @@
 export const api = async <T>(url: string, options: any = {}): Promise<T> => {
     const authStore = useAuthStore()
 
-    const headers = {
+    const headers: Record<string, string> = {
         ...options.headers,
         ...(authStore.token ? { Authorization: `Bearer ${authStore.token}` } : {})
     }
@@ -16,10 +16,10 @@ export const api = async <T>(url: string, options: any = {}): Promise<T> => {
             headers
         })
     } catch (error: any) {
-        const statusCode = error.status || error.response?.status;
+        const statusCode = error.status || error.response?.status
 
         if (statusCode === 401 || statusCode === 403) {
-            authStore.logout()
+            await authStore.logout()
         }
         throw error
     }

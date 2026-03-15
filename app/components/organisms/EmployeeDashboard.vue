@@ -8,7 +8,6 @@ import EmployeeSummaryCards from '~/components/molecules/EmployeeSummaryCards.vu
 import YearlyEvolutionChart from '~/components/organisms/YearlyEvolutionChart.vue'
 import WeeklyEvolutionChart from '~/components/organisms/WeeklyEvolutionChart.vue'
 import DailyRecordsTimeline from '~/components/organisms/DailyRecordsTimeline.vue'
-import {useLocale} from "~/composables/useLocale";
 
 const props = defineProps<{
   currentRole: string

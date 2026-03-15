@@ -57,7 +57,7 @@ async function handleSave(payload: any, id: string | null) {
   if (isSubmitting.value) return
   isSubmitting.value = true
 
-  let success = false
+  let success
   if (id) {
     success = await specialDatesStore.update(id, payload)
   } else {
@@ -110,7 +110,7 @@ async function handleDelete(id: string) {
         <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{{ t.calendar.subtitle }}</p>
       </div>
       <div class="flex flex-wrap items-center gap-3">
-        <div class="w-32">
+        <div class="w-32 relative z-50">
           <BaseSelect v-model="selectedYear" :options="yearOptions" />
         </div>
 
@@ -120,7 +120,7 @@ async function handleDelete(id: string) {
           <span class="hidden sm:inline">{{ t.calendar.importNational }}</span>
         </button>
 
-        <button @click="openModal()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition-colors flex items-center gap-2 cursor-pointer h-[42px]">
+        <button @click="openModal()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition-colors flex items-center gap-2 cursor-pointer h-10">
           <Plus :size="16" />
           <span class="hidden sm:inline">{{ t.calendar.newDate }}</span>
         </button>
@@ -131,8 +131,8 @@ async function handleDelete(id: string) {
       {{ message }}
     </div>
 
-    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl overflow-hidden shadow-sm flex flex-col">
-      <div class="p-4 border-b border-gray-100 dark:border-gray-800">
+    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm flex flex-col relative z-0">
+      <div class="p-4 border-b border-gray-100 dark:border-gray-800 rounded-t-3xl">
         <SearchInput
             v-model="searchQuery"
             :placeholder="t.calendar.searchPlaceholder"
@@ -149,7 +149,7 @@ async function handleDelete(id: string) {
         <p class="text-sm font-bold text-gray-500">{{ t.calendar.empty }}</p>
       </div>
 
-      <div v-else class="divide-y divide-gray-100 dark:divide-gray-800">
+      <div v-else class="divide-y divide-gray-100 dark:divide-gray-800 w-full">
         <div v-for="sd in specialDatesStore.specialDates" :key="sd.id" class="flex items-center justify-between p-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
           <div class="flex items-center gap-6">
             <div class="w-16 h-16 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-2xl flex flex-col items-center justify-center font-bold ring-1 ring-indigo-100 dark:ring-indigo-800/50">
@@ -168,7 +168,7 @@ async function handleDelete(id: string) {
               </p>
             </div>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 relative z-10">
             <button @click="openModal(sd)" class="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors cursor-pointer">
               <Pencil :size="18" />
             </button>
@@ -179,11 +179,13 @@ async function handleDelete(id: string) {
         </div>
       </div>
 
-      <PaginationControls
-          :current-page="specialDatesStore.currentPage"
-          :total-pages="specialDatesStore.totalPages"
-          @page-change="fetchData"
-      />
+      <div class="rounded-b-3xl overflow-hidden">
+          <PaginationControls
+              :current-page="specialDatesStore.currentPage"
+              :total-pages="specialDatesStore.totalPages"
+              @page-change="fetchData"
+          />
+      </div>
     </div>
 
     <SpecialDateModal

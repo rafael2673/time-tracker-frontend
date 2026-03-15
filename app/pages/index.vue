@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import { useWorkspaceStore } from '~/stores/workspaces'
 import { useEmployeesStore } from '~/stores/employees'
@@ -11,6 +11,10 @@ import CompanyDashboard from '~/components/organisms/CompanyDashboard.vue'
 import EmployeeDashboard from '~/components/organisms/EmployeeDashboard.vue'
 import ToastNotification from '~/components/molecules/ToastNotification.vue'
 import { Loader2 } from 'lucide-vue-next'
+import { useRoute, useRouter } from 'vue-router'
+
+const route = useRoute()
+const router = useRouter()
 
 const authStore = useAuthStore()
 const workspaceStore = useWorkspaceStore()
@@ -37,27 +41,27 @@ const selectedEmployee = computed(() => {
   return employeesStore.members.find(m => m.id === selectedEmployeeId.value)
 })
 
-onMounted(async () => {
-  if (workspaceStore.workspaces.length > 0 && authStore.activeWorkspaceId) {
-    applyRoleViewRules()
-    await loadDashboardData()
-    isPageLoading.value = false
-  } else if (!authStore.activeWorkspaceId) {
-      isPageLoading.value = true
-  }
+const isDataReady = computed(() => {
+  return workspaceStore.workspaces.length > 0 && authStore.activeWorkspaceId
 })
 
-watch(() => workspaceStore.workspaces, async (workspaces) => {
-    if (workspaces.length > 0 && authStore.activeWorkspaceId) {
-        applyRoleViewRules()
-        await loadDashboardData()
-        isPageLoading.value = false
+watch(isDataReady, async (ready) => {
+  if (ready) {
+    isPageLoading.value = true
+    applyRoleViewRules()
+
+    if (route.query.employeeId && currentRole.value !== 'EMPLOYEE') {
+      await selectEmployee(route.query.employeeId as string)
+      await router.replace({ query: {} })
+    } else {
+      await loadDashboardData()
     }
-}, { deep: true })
+    isPageLoading.value = false
+  }
+}, { immediate: true })
 
-
-watch(() => authStore.activeWorkspaceId, async (newId) => {
-  if (newId) {
+watch(() => authStore.activeWorkspaceId, async (newId, oldId) => {
+  if (newId && oldId && newId !== oldId) {
     isPageLoading.value = true
     applyRoleViewRules()
     await loadDashboardData()
@@ -86,12 +90,14 @@ async function loadDashboardData() {
       policiesStore.fetchPolicies(),
       summaryStore.fetchMonthlyBalance(currentYear, currentMonth)
     ])
-  } else if (viewLevel.value === 'EMPLOYEE' && selectedEmployeeId.value) {
+  } else if (viewLevel.value === 'EMPLOYEE') {
     const today = now.toISOString().split('T')[0]
-    if (today) {
+    const employeeIdToFetch = selectedEmployeeId.value || authStore.user?.id
+
+    if (today && employeeIdToFetch) {
       await Promise.all([
-        timeRecordsStore.fetchDailyRecords(selectedEmployeeId.value, today),
-        summaryStore.fetchEmployeeSummary(selectedEmployeeId.value)
+        timeRecordsStore.fetchDailyRecords(employeeIdToFetch, today),
+        summaryStore.fetchEmployeeSummary(employeeIdToFetch)
       ])
     }
   }
@@ -113,6 +119,8 @@ async function selectEmployee(id: string) {
 function backToCompany() {
   selectedEmployeeId.value = null
   viewLevel.value = 'COMPANY'
+  // Quando voltar para empresa, carrega os dados da empresa caso não estejam cacheados
+  loadDashboardData()
 }
 
 function showToast(message: string, type: 'success' | 'error') {

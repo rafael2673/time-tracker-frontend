@@ -36,7 +36,6 @@ export const useSummaryStore = defineStore('summary', () => {
 
     const employeeSummary = ref<EmployeeDashboardSummary | null>(null)
     const monthlyBalance = ref<MonthlyBalanceResponse | null>(null)
-    const quarterlyBalance = ref<MonthlyBalanceResponse | null>(null)
     const yearlySummary = ref<MonthSummaryResponse[]>([])
     const weeklySummary = ref<DailySummaryResponse[]>([])
     const availableYears = ref<number[]>([])
@@ -70,19 +69,10 @@ export const useSummaryStore = defineStore('summary', () => {
         }
     }
 
-    async function fetchQuarterlyBalance(year: number, quarter: number) {
-        try {
-            quarterlyBalance.value = await api<MonthlyBalanceResponse>(`/api/v1/summary/quarterly-balance?year=${year}&quarter=${quarter}`)
-        } catch (error) {
-            console.error('Failed to fetch quarterly balance:', error)
-            quarterlyBalance.value = null
-        }
-    }
-
     async function fetchYearlySummary(year: number) {
         try {
             yearlySummary.value = await api<MonthSummaryResponse[]>(`/api/v1/summary/yearly?year=${year}`, {
-                headers: { 'Accept-Language': locale.value, 'X-Workspace-Id': authStore.activeWorkspaceId }
+                headers: { 'Accept-Language': locale.value, 'X-Workspace-Id': authStore.activeWorkspaceId || '' }
             })
         } catch (error) {
             console.error('Failed to fetch yearly summary:', error)
@@ -93,7 +83,7 @@ export const useSummaryStore = defineStore('summary', () => {
     async function fetchWeeklySummary(date: string) {
         try {
             weeklySummary.value = await api<DailySummaryResponse[]>(`/api/v1/summary/weekly?date=${date}`, {
-                headers: { 'Accept-Language': locale.value, 'X-Workspace-Id': authStore.activeWorkspaceId }
+                headers: { 'Accept-Language': locale.value, 'X-Workspace-Id': authStore.activeWorkspaceId || '' }
             })
         } catch (error) {
             console.error('Failed to fetch weekly summary:', error)
@@ -114,21 +104,22 @@ export const useSummaryStore = defineStore('summary', () => {
         if (!authStore.activeWorkspaceId) return
         const currentYear = new Date().getFullYear()
         const currentDate = new Date().toISOString().split('T')[0] || ''
-        fetchYearlySummary(currentYear)
-        fetchWeeklySummary(currentDate)
+        
+        Promise.all([
+            fetchYearlySummary(currentYear),
+            fetchWeeklySummary(currentDate)
+        ]).catch(console.error)
     })
 
     return {
         employeeSummary,
         monthlyBalance,
-        quarterlyBalance,
         yearlySummary,
         weeklySummary,
         availableYears,
         isLoadingSummary,
         fetchEmployeeSummary,
         fetchMonthlyBalance,
-        fetchQuarterlyBalance,
         fetchYearlySummary,
         fetchWeeklySummary,
         fetchAvailableYears
