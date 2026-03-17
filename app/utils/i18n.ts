@@ -83,7 +83,26 @@ export const translations = {
             policies: 'Políticas',
             calendar: 'Calendário',
             settings: 'Configurações',
-            logout: 'Sair'
+            logout: 'Sair',
+            closures: 'Fechamento de Folha'
+        },
+        closures: {
+            title: 'Fechamento de Folha',
+            subtitle: 'Consolide as horas trabalhadas e gere o extrato de banco de horas e horas extras.',
+            closeMonth: 'Fechar Mês',
+            confirmClose: 'Atenção: Fechar o mês é uma ação irreversível. Todos os saldos serão consolidados e apontamentos pendentes ignorados. Deseja continuar?',
+            successClose: 'Folha fechada com sucesso!',
+            alreadyClosed: 'Este mês já foi fechado.',
+            notClosed: 'Mês ainda não fechado (Cálculo Dinâmico)',
+            employee: 'Colaborador',
+            worked: 'Trabalhado',
+            expected: 'Esperado',
+            balance: 'Saldo',
+            banked: 'Banco de Horas',
+            overtime: 'Hora Extra (Pagar)',
+            closedAt: 'Fechado em',
+            error: 'Erro ao processar fechamento.',
+            empty: 'Nenhum registro de fechamento encontrado para este mês.'
         },
         calendar: {
             title: 'Feriados e Datas Especiais',
@@ -304,7 +323,26 @@ export const translations = {
             policies: 'Policies',
             calendar: 'Calendar',
             settings: 'Settings',
-            logout: 'Sign Out'
+            logout: 'Sign Out',
+            closures: 'Payroll Closing',
+        },
+        closures: {
+            title: 'Payroll Closing',
+            subtitle: 'Consolidate worked hours and generate the time bank and overtime statement.',
+            closeMonth: 'Close Month',
+            confirmClose: 'Warning: Closing the month is an irreversible action. All balances will be consolidated and pending entries will be ignored. Do you want to continue?',
+            successClose: 'Payroll successfully closed!',
+            alreadyClosed: 'This month has already been closed.',
+            notClosed: 'Month not yet closed (Dynamic Calculation)',
+            employee: 'Employee',
+            worked: 'Worked',
+            expected: 'Expected',
+            balance: 'Balance',
+            banked: 'Time Bank',
+            overtime: 'Overtime (To Pay)',
+            closedAt: 'Closed At',
+            error: 'Error processing closing.',
+            empty: 'No closing records found for this month.'
         },
         calendar: {
             title: 'Holidays and Special Dates',

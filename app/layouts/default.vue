@@ -29,7 +29,8 @@ const navigation = computed(() => [
   { name: t.value.navigation.approvals, href: '/approvals', icon: CheckSquare },
   { name: t.value.navigation.employees, href: '/employees', icon: Users },
   { name: t.value.navigation.policies, href: '/policies', icon: Briefcase },
-  { name: t.value.navigation.calendar, href: '/calendar', icon: Calendar }
+  { name: t.value.navigation.calendar, href: '/calendar', icon: Calendar },
+  { name: t.value.navigation.closures, href: '/closures', icon: Lock },
 ])
 
 const currentRole = computed(() => {
