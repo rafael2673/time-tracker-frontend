@@ -16,8 +16,11 @@ defineProps<{
     <WorkspaceSelector v-if="isMounted && workspaceStore.workspaces.length > 0" />
     <div v-else class="min-w-60"></div>
 
-    <div class="flex items-center divide-x divide-gray-200 dark:divide-gray-800">
-      <ThemeLocaleControls v-if="isMounted" class="pr-4" />
+    <div class="flex items-center gap-4">
+      <ThemeLocaleControls v-if="isMounted" />
+
+      <div v-if="isMounted" class="w-px h-6 bg-gray-200 dark:bg-gray-800"></div>
+
       <ProfileDropdown v-if="isMounted" />
     </div>
   </header>

@@ -3,7 +3,16 @@ import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import { useWorkspaceStore } from '~/stores/workspaces'
 import { useLocale } from '~/composables/useLocale'
-import { LayoutDashboard, Users, Briefcase, Menu, ChevronLeft, ChevronRight, Calendar } from 'lucide-vue-next'
+import {
+  LayoutDashboard,
+  Users,
+  Briefcase,
+  Menu,
+  ChevronLeft,
+  ChevronRight,
+  Calendar,
+  CheckSquare
+} from 'lucide-vue-next'
 import MainSidebarNavigation from '~/components/molecules/MainSidebarNavigation.vue'
 import TopHeader from '~/components/organisms/TopHeader.vue'
 
@@ -17,6 +26,7 @@ const isSidebarCollapsed = ref(false)
 
 const navigation = computed(() => [
   { name: t.value.navigation.dashboard, href: '/', icon: LayoutDashboard },
+  { name: t.value.navigation.approvals, href: '/approvals', icon: CheckSquare },
   { name: t.value.navigation.employees, href: '/employees', icon: Users },
   { name: t.value.navigation.policies, href: '/policies', icon: Briefcase },
   { name: t.value.navigation.calendar, href: '/calendar', icon: Calendar }

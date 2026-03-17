@@ -18,9 +18,12 @@ const { t } = useLocale()
 function getInitials(name: string): string {
   if (!name) return '?'
   const parts = name.trim().split(/\s+/)
-  const firstChar = parts[0]?.[0] || ''
-  const lastChar = parts[parts.length - 1]?.[0] || ''
-  return parts.length >= 2 ? (firstChar + lastChar).toUpperCase() : name.substring(0, 2).toUpperCase()
+  if (parts.length >= 2) {
+    const firstChar = parts[0]?.[0] || ''
+    const lastChar = parts[parts.length - 1]?.[0] || ''
+    return (firstChar + lastChar).toUpperCase()
+  }
+  return name.substring(0, 2).toUpperCase()
 }
 
 function getRoleTranslation(role: string): string {
@@ -39,7 +42,7 @@ function getRoleTranslation(role: string): string {
         <div class="min-w-0">
           <div class="flex items-center gap-2">
             <p class="font-bold text-gray-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" :class="{'line-through decoration-gray-400': !props.member.active}">{{ props.member.fullName }}</p>
-            <span v-if="!props.member.active" class="px-1.5 py-0.5 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 text-[8px] font-bold rounded uppercase tracking-widest">Inativo</span>
+            <span v-if="!props.member.active" class="px-1.5 py-0.5 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 text-[8px] font-bold rounded uppercase tracking-widest">{{ t.employees.inactive || 'Inativo' }}</span>
           </div>
           <p class="text-xs font-medium text-gray-500 dark:text-gray-400 truncate">{{ props.member.email }}</p>
         </div>

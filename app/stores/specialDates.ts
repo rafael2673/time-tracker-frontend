@@ -18,13 +18,6 @@ export interface SpecialDateRequest {
     isRecurring: boolean
 }
 
-export interface PageResponse<T> {
-    content: T[]
-    totalPages: number
-    totalElements: number
-    number: number
-}
-
 export const useSpecialDatesStore = defineStore('specialDates', () => {
     const authStore = useAuthStore()
     const specialDates = ref<SpecialDateResponse[]>([])
@@ -33,16 +26,13 @@ export const useSpecialDatesStore = defineStore('specialDates', () => {
     const totalElements = ref(0)
     const isLoading = ref(false)
 
-    async function fetchByYear(year: number, page: number = 0, search: string = '') {
+    async function fetchByYear(year: number, page: number = 0, search: string = '', exactDate: string = '') {
         if (!authStore.activeWorkspaceId) return
         isLoading.value = true
         try {
-            const query = new URLSearchParams({
-                year: String(year),
-                page: String(page),
-                size: '10'
-            })
+            const query = new URLSearchParams({ year: String(year), page: String(page), size: '10' })
             if (search) query.append('search', search)
+            if (exactDate) query.append('exactDate', exactDate)
 
             const response = await api<PageResponse<SpecialDateResponse>>(`/api/v1/special-dates?${query.toString()}`, {
                 headers: { 'X-Workspace-Id': authStore.activeWorkspaceId }

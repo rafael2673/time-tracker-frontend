@@ -9,9 +9,9 @@ import { useLocale } from '~/composables/useLocale'
 import { Plus, Loader2, Users } from 'lucide-vue-next'
 import EmployeesTable from '~/components/organisms/EmployeesTable.vue'
 import EmployeeModal from '~/components/organisms/EmployeeModal.vue'
-import SearchInput from '~/components/atoms/SearchInput.vue'
 import PaginationControls from '~/components/molecules/PaginationControls.vue'
 import EmployeeLeaveModal from "~/components/organisms/EmployeeLeaveModal.vue";
+import FilterBar from "~/components/molecules/FilterBar.vue";
 
 const employeesStore = useEmployeesStore()
 const policiesStore = usePoliciesStore()
@@ -21,6 +21,7 @@ const router = useRouter()
 const { t } = useLocale()
 
 const searchQuery = ref('')
+const roleFilter = ref('')
 const isModalOpen = ref<boolean>(false)
 const isLeaveModalOpen = ref<boolean>(false)
 const isSubmitting = ref<boolean>(false)
@@ -48,6 +49,13 @@ const availableRoles = computed(() => {
   return ['EMPLOYEE', 'MANAGER']
 })
 
+const roleFilterOptions = computed(() => {
+  return availableRoles.value.map(r => ({
+    value: r,
+    label: (t.value.employees.roles as Record<string, string>)[r] || r
+  }))
+})
+
 onMounted(async () => {
   if (authStore.activeWorkspaceId) {
     await loadData()
@@ -58,13 +66,14 @@ watch(() => authStore.activeWorkspaceId, async (newVal) => {
   if (newVal) {
     employeesStore.currentPage = 0
     searchQuery.value = ''
+    roleFilter.value = ''
     await loadData()
   }
 })
 
 async function loadData(page: number = 0) {
   await Promise.all([
-    employeesStore.fetchMembers(page, searchQuery.value),
+    employeesStore.fetchMembers(page, searchQuery.value, roleFilter.value),
     policiesStore.fetchPolicies()
   ])
 }
@@ -143,9 +152,12 @@ function navigateToDashboard(id: string) {
 
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm flex flex-col relative z-0">
       <div class="p-4 border-b border-gray-100 dark:border-gray-800 rounded-t-3xl">
-        <SearchInput
-            v-model="searchQuery"
-            :placeholder="t.employees.searchPlaceholder"
+        <FilterBar
+            v-model:search-value="searchQuery"
+            v-model:role-value="roleFilter"
+            :show-role-filter="true"
+            :role-options="roleFilterOptions"
+            :search-placeholder="t.employees.searchPlaceholder"
             @search="loadData(0)"
         />
       </div>

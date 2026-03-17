@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { MoreVertical, Pencil, KeyRound, CheckCircle2, Copy, Loader2, LayoutDashboard, UserX, UserCheck, CalendarOff } from 'lucide-vue-next'
 import { useLocale } from '~/composables/useLocale'
 import { useEmployeesStore } from '~/stores/employees'
+import ConfirmModal from '~/components/molecules/ConfirmModal.vue'
 
 const props = defineProps<{
   employeeId: string
@@ -21,9 +22,11 @@ const employeesStore = useEmployeesStore()
 const isOpen = ref(false)
 const generatedCode = ref<string | null>(null)
 const isGenerating = ref(false)
-const isStatusChanging = ref(false)
 const isCopied = ref(false)
 const menuRef = ref<HTMLElement | null>(null)
+
+const isConfirmModalOpen = ref(false)
+const isStatusChanging = ref(false)
 
 function toggleMenu() {
   isOpen.value = !isOpen.value
@@ -53,16 +56,21 @@ function triggerManageLeaves() {
   emit('manage-leaves')
 }
 
-async function handleStatusChange() {
+function triggerStatusChange() {
+  isOpen.value = false
+  isConfirmModalOpen.value = true
+}
+
+async function executeStatusChange() {
   if (isStatusChanging.value) return
   isStatusChanging.value = true
 
   if (props.isActive !== undefined && typeof employeesStore.changeStatus === 'function') {
-      await employeesStore.changeStatus(props.employeeId, !props.isActive)
+    await employeesStore.changeStatus(props.employeeId, !props.isActive)
   }
 
   isStatusChanging.value = false
-  isOpen.value = false
+  isConfirmModalOpen.value = false
 }
 
 async function handleGenerateCode() {
@@ -109,14 +117,13 @@ function copyToClipboard() {
 
           <button @click="triggerManageLeaves" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors cursor-pointer">
             <CalendarOff :size="16" class="text-gray-400" />
-            {{ t.employees.manageLeaves || 'Gerenciar Ausências' }}
+            {{ t.employees.manageLeaves }}
           </button>
 
           <div class="h-px bg-gray-100 dark:bg-gray-800 my-1"></div>
 
-          <button v-if="props.isActive !== undefined" @click="handleStatusChange" :disabled="isStatusChanging" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-xl transition-colors cursor-pointer disabled:opacity-50" :class="props.isActive ? 'text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20'">
-            <Loader2 v-if="isStatusChanging" :size="16" class="animate-spin" />
-            <UserX v-else-if="props.isActive" :size="16" />
+          <button v-if="props.isActive !== undefined" @click="triggerStatusChange" :disabled="isStatusChanging" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-xl transition-colors cursor-pointer disabled:opacity-50" :class="props.isActive ? 'text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20'">
+            <UserX v-if="props.isActive" :size="16" />
             <UserCheck v-else :size="16" />
             {{ props.isActive ? (t.employees.deactivate || 'Desativar Colaborador') : (t.employees.reactivate || 'Reativar Colaborador') }}
           </button>
@@ -144,5 +151,14 @@ function copyToClipboard() {
         </div>
       </div>
     </Transition>
+
+    <ConfirmModal
+        :show="isConfirmModalOpen"
+        :title="props.isActive ? t.employees.deactivateTitle : t.employees.reactivateTitle"
+        :message="props.isActive ? t.employees.confirmDeactivate : t.employees.confirmReactivate"
+        :is-loading="isStatusChanging"
+        @confirm="executeStatusChange"
+        @cancel="isConfirmModalOpen = false"
+    />
   </div>
 </template>

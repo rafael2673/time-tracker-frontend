@@ -49,10 +49,36 @@ export const translations = {
             hourBalance: 'Saldo de Horas',
             pendingJustifications: 'Justificativas Pendentes',
             workloadSummary: 'Resumo da Jornada',
-            acceptedJustifications: 'Justificativas Aceitas'
+            acceptedJustifications: 'Justificativas Aceitas',
+            workedHoursQuarter: 'Horas Trab. (Trimestre)',
+            balanceQuarter: 'Saldo (Trimestre)',
+        },
+        approvals: {
+            title: 'Justificativas',
+            subtitle: 'Revise os apontamentos manuais pendentes da equipe.',
+            empty: 'Nenhuma justificativa pendente no momento. Excelente!',
+            approve: 'Aprovar',
+            reject: 'Recusar',
+            employee: 'Colaborador',
+            time: 'Horário',
+            type: 'Tipo',
+            justification: 'Justificativa',
+            successApprove: 'Apontamento aprovado com sucesso!',
+            successReject: 'Apontamento recusado e removido.',
+            error: 'Erro ao processar a justificativa.',
+            confirmApprove: 'Tem certeza que deseja aprovar este apontamento?',
+            confirmReject: 'Tem certeza que deseja recusar? O registro será excluído.',
+            searchPlaceholder: 'Buscar por colaborador ou justificativa...',
+            types: {
+                ENTRY: 'Entrada',
+                EXIT: 'Saída',
+                PAUSE_START: 'Início Pausa',
+                PAUSE_END: 'Fim Pausa'
+            }
         },
         navigation: {
             dashboard: 'Dashboard',
+            approvals: 'Aprovações',
             employees: 'Colaboradores',
             policies: 'Políticas',
             calendar: 'Calendário',
@@ -83,6 +109,8 @@ export const translations = {
             searchPlaceholder: 'Buscar data...',
             previous: 'Anterior',
             next: 'Próxima',
+            deleteDateTitle: 'Excluir Data Especial',
+            confirmDeleteDate: 'Tem certeza que deseja excluir esta data?',
         },
         modal: {
             confirm: 'Confirmar',
@@ -152,6 +180,11 @@ export const translations = {
             leaveDeleted: 'Ausência removida com sucesso.',
             confirmDeactivate: 'Tem certeza que deseja inativar este colaborador?',
             confirmReactivate: 'Deseja reativar este colaborador?',
+            deactivateTitle: 'Inativar Colaborador',
+            reactivateTitle: 'Reativar Colaborador',
+            deleteLeaveTitle: 'Excluir Ausência',
+            confirmDeleteLeave: 'Tem certeza que deseja excluir este registro de ausência?',
+            emptyLeaves: 'Nenhuma folga cadastrada.',
             roles: {
                 ADMIN: 'Administrador',
                 MANAGER: 'Gestor (RH)',
@@ -182,7 +215,10 @@ export const translations = {
         },
         workspaces: {
             selectorPlaceholder: 'Selecione a Empresa'
-        }
+        },
+        filter: {
+            clean: 'Limpar',
+        },
     },
     'en': {
         login: {
@@ -234,10 +270,36 @@ export const translations = {
             hourBalance: 'Hour Balance',
             pendingJustifications: 'Pending Justifications',
             workloadSummary: 'Workload Summary',
-            acceptedJustifications: 'Accepted Justifications'
+            acceptedJustifications: 'Accepted Justifications',
+            workedHoursQuarter: 'Worked Hrs (Quarter)',
+            balanceQuarter: 'Balance (Quarter)',
+        },
+        approvals: {
+            title: 'Justifications',
+            subtitle: 'Review the team’s pending manual time entries.',
+            empty: 'No pending justifications at the moment. Excellent!',
+            approve: 'Approve',
+            reject: 'Reject',
+            employee: 'Employee',
+            time: 'Time',
+            type: 'Type',
+            justification: 'Justification',
+            successApprove: 'Time entry approved successfully!',
+            successReject: 'Time entry rejected and removed.',
+            error: 'Error processing the justification.',
+            confirmApprove: 'Are you sure you want to approve this time entry?',
+            confirmReject: 'Are you sure you want to reject it? The record will be deleted.',
+            searchPlaceholder: 'Search by employee or justification...',
+            types: {
+                ENTRY: 'Clock In',
+                EXIT: 'Clock Out',
+                PAUSE_START: 'Break Start',
+                PAUSE_END: 'Break End'
+            }
         },
         navigation: {
             dashboard: 'Dashboard',
+            approvals: 'Approvals',
             employees: 'Employees',
             policies: 'Policies',
             calendar: 'Calendar',
@@ -268,6 +330,8 @@ export const translations = {
             searchPlaceholder: 'Search date...',
             previous: 'Previous',
             next: 'Next',
+            deleteDateTitle: 'Delete Special Date',
+            confirmDeleteDate: 'Are you sure you want to delete this date?',
         },
         modal: {
             confirm: 'Confirm',
@@ -337,6 +401,11 @@ export const translations = {
             leaveDeleted: 'Leave removed successfully.',
             confirmDeactivate: 'Are you sure you want to deactivate this employee?',
             confirmReactivate: 'Do you want to reactivate this employee?',
+            deactivateTitle: 'Deactivate Employee',
+            reactivateTitle: 'Reactivate Employee',
+            deleteLeaveTitle: 'Delete Leave',
+            confirmDeleteLeave: 'Are you sure you want to delete this leave record?',
+            emptyLeaves: 'No days off registered.',
             roles: {
                 ADMIN: 'Administrator',
                 MANAGER: 'Manager (HR)',
@@ -367,6 +436,9 @@ export const translations = {
         },
         workspaces: {
             selectorPlaceholder: 'Select Workspace'
-        }
+        },
+        filter: {
+            clean: 'Limpar',
+        },
     }
 }

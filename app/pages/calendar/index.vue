@@ -4,21 +4,27 @@ import { Calendar as CalendarIcon, Loader2, Plus, Trash2, CalendarDays, Repeat, 
 import { useSpecialDatesStore } from '~/stores/specialDates'
 import { useLocale } from '~/composables/useLocale'
 import BaseSelect from '~/components/atoms/BaseSelect.vue'
-import SearchInput from '~/components/atoms/SearchInput.vue'
+import FilterBar from '~/components/molecules/FilterBar.vue'
 import PaginationControls from '~/components/molecules/PaginationControls.vue'
 import SpecialDateModal from '~/components/organisms/SpecialDateModal.vue'
+import ConfirmModal from '~/components/molecules/ConfirmModal.vue'
 
 const specialDatesStore = useSpecialDatesStore()
 const { t } = useLocale()
 
 const selectedYear = ref(new Date().getFullYear())
 const searchQuery = ref('')
+const dateFilter = ref('')
 const isModalOpen = ref(false)
 const isSubmitting = ref(false)
 const isImporting = ref(false)
 const message = ref('')
 const messageType = ref<'success' | 'error'>('success')
 const editingDate = ref<any>(null)
+
+const isConfirmModalOpen = ref(false)
+const isDeleting = ref(false)
+const itemToDelete = ref<string | null>(null)
 
 const yearOptions = computed(() => {
   const current = new Date().getFullYear()
@@ -39,7 +45,7 @@ watch(selectedYear, () => {
 })
 
 function fetchData(page: number = 0) {
-  specialDatesStore.fetchByYear(selectedYear.value, page, searchQuery.value)
+  specialDatesStore.fetchByYear(selectedYear.value, page, searchQuery.value, dateFilter.value)
 }
 
 function showMessage(msg: string, type: 'success' | 'error') {
@@ -57,7 +63,7 @@ async function handleSave(payload: any, id: string | null) {
   if (isSubmitting.value) return
   isSubmitting.value = true
 
-  let success
+  let success: boolean
   if (id) {
     success = await specialDatesStore.update(id, payload)
   } else {
@@ -89,16 +95,26 @@ async function handleImport() {
   isImporting.value = false
 }
 
-async function handleDelete(id: string) {
-  if (confirm(t.value.modal.confirm)) {
-    const success = await specialDatesStore.remove(id)
-    if (success) {
-      showMessage(t.value.calendar.successDelete, 'success')
-      fetchData(specialDatesStore.currentPage)
-    } else {
-      showMessage(t.value.calendar.error, 'error')
-    }
+function confirmDelete(id: string) {
+  itemToDelete.value = id
+  isConfirmModalOpen.value = true
+}
+
+async function executeDelete() {
+  if (!itemToDelete.value) return
+  isDeleting.value = true
+
+  const success = await specialDatesStore.remove(itemToDelete.value)
+  if (success) {
+    showMessage(t.value.calendar.successDelete, 'success')
+    fetchData(specialDatesStore.currentPage)
+  } else {
+    showMessage(t.value.calendar.error, 'error')
   }
+
+  isDeleting.value = false
+  isConfirmModalOpen.value = false
+  itemToDelete.value = null
 }
 </script>
 
@@ -110,17 +126,17 @@ async function handleDelete(id: string) {
         <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{{ t.calendar.subtitle }}</p>
       </div>
       <div class="flex flex-wrap items-center gap-3">
-        <div class="w-32 relative z-50">
+        <div class="w-32">
           <BaseSelect v-model="selectedYear" :options="yearOptions" />
         </div>
 
-        <button @click="handleImport" :disabled="isImporting" class="px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold text-sm rounded-xl shadow-sm transition-colors flex items-center gap-2 cursor-pointer h-10 disabled:opacity-50">
+        <button @click="handleImport" :disabled="isImporting" class="px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold text-sm rounded-xl shadow-sm transition-colors flex items-center gap-2 cursor-pointer h-[42px] disabled:opacity-50">
           <Loader2 v-if="isImporting" :size="16" class="animate-spin" />
           <Download v-else :size="16" />
           <span class="hidden sm:inline">{{ t.calendar.importNational }}</span>
         </button>
 
-        <button @click="openModal()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition-colors flex items-center gap-2 cursor-pointer h-10">
+        <button @click="openModal()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition-colors flex items-center gap-2 cursor-pointer h-[42px]">
           <Plus :size="16" />
           <span class="hidden sm:inline">{{ t.calendar.newDate }}</span>
         </button>
@@ -132,13 +148,14 @@ async function handleDelete(id: string) {
     </div>
 
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm flex flex-col relative z-0">
-      <div class="p-4 border-b border-gray-100 dark:border-gray-800 rounded-t-3xl">
-        <SearchInput
-            v-model="searchQuery"
-            :placeholder="t.calendar.searchPlaceholder"
-            @search="fetchData(0)"
-        />
-      </div>
+
+      <FilterBar
+          v-model:search-value="searchQuery"
+          v-model:date-value="dateFilter"
+          :show-date-filter="true"
+          :search-placeholder="t.calendar.searchPlaceholder"
+          @search="fetchData(0)"
+      />
 
       <div v-if="specialDatesStore.isLoading" class="flex justify-center p-12">
         <Loader2 class="animate-spin text-indigo-500" :size="32" />
@@ -149,7 +166,7 @@ async function handleDelete(id: string) {
         <p class="text-sm font-bold text-gray-500">{{ t.calendar.empty }}</p>
       </div>
 
-      <div v-else class="divide-y divide-gray-100 dark:divide-gray-800 w-full">
+      <div v-else class="divide-y divide-gray-100 dark:divide-gray-800">
         <div v-for="sd in specialDatesStore.specialDates" :key="sd.id" class="flex items-center justify-between p-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
           <div class="flex items-center gap-6">
             <div class="w-16 h-16 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-2xl flex flex-col items-center justify-center font-bold ring-1 ring-indigo-100 dark:ring-indigo-800/50">
@@ -168,11 +185,11 @@ async function handleDelete(id: string) {
               </p>
             </div>
           </div>
-          <div class="flex items-center gap-2 relative z-10">
+          <div class="flex items-center gap-2">
             <button @click="openModal(sd)" class="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors cursor-pointer">
               <Pencil :size="18" />
             </button>
-            <button @click="handleDelete(sd.id)" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors cursor-pointer">
+            <button @click="confirmDelete(sd.id)" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors cursor-pointer">
               <Trash2 :size="18" />
             </button>
           </div>
@@ -180,11 +197,12 @@ async function handleDelete(id: string) {
       </div>
 
       <div class="rounded-b-3xl overflow-hidden">
-          <PaginationControls
-              :current-page="specialDatesStore.currentPage"
-              :total-pages="specialDatesStore.totalPages"
-              @page-change="fetchData"
-          />
+        <PaginationControls
+            v-if="specialDatesStore.specialDates.length > 0"
+            :current-page="specialDatesStore.currentPage"
+            :total-pages="specialDatesStore.totalPages"
+            @page-change="fetchData"
+        />
       </div>
     </div>
 
@@ -194,6 +212,15 @@ async function handleDelete(id: string) {
         :editing-date="editingDate"
         @close="isModalOpen = false"
         @save="handleSave"
+    />
+
+    <ConfirmModal
+        :show="isConfirmModalOpen"
+        :title="t.calendar.deleteDateTitle"
+        :message="t.calendar.confirmDeleteDate"
+        :is-loading="isDeleting"
+        @confirm="executeDelete"
+        @cancel="isConfirmModalOpen = false"
     />
   </div>
 </template>

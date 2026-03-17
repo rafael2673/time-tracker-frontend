@@ -33,7 +33,7 @@ const balanceClass = computed(() => {
         <h3 class="text-3xl font-bold text-gray-900 dark:text-white tabular-nums">
           {{ props.summary !== null ? formatDecimalHours(props.summary.workedHours) : '--' }}
         </h3>
-        <p class="text-sm font-bold uppercase tracking-wider text-gray-400 mt-1">Horas Trab. (Trimestre)</p>
+        <p class="text-sm font-bold uppercase tracking-wider text-gray-400 mt-1">{{ t.dashboard.workedHoursQuarter }}</p>
       </div>
     </div>
 
@@ -48,7 +48,7 @@ const balanceClass = computed(() => {
         <h3 class="text-3xl font-bold tabular-nums" :class="balanceClass">
           {{ props.summary !== null ? formatDecimalHours(props.summary.balance) : '--' }}
         </h3>
-        <p class="text-sm font-bold uppercase tracking-wider text-gray-400 mt-1">Saldo (Trimestre)</p>
+        <p class="text-sm font-bold uppercase tracking-wider text-gray-400 mt-1">{{ t.dashboard.balanceQuarter }}</p>
       </div>
     </div>
 

@@ -45,6 +45,13 @@ export interface EmployeeLeaveRequest {
     reason: string
 }
 
+export interface PageResponse<T> {
+    content: T[]
+    totalPages: number
+    totalElements: number
+    number: number
+}
+
 export const useEmployeesStore = defineStore('employees', () => {
     const authStore = useAuthStore()
     const members = ref<WorkspaceMemberResponse[]>([])
@@ -54,12 +61,13 @@ export const useEmployeesStore = defineStore('employees', () => {
     const totalElements = ref(0)
     const isLoading = ref(false)
 
-    async function fetchMembers(page: number = 0, search: string = '') {
+    async function fetchMembers(page: number = 0, search: string = '', role: string = '') {
         if (!authStore.activeWorkspaceId) return
         isLoading.value = true
         try {
             const query = new URLSearchParams({ page: String(page), size: '10' })
             if (search) query.append('search', search)
+            if (role) query.append('role', role)
 
             const response = await api<PageResponse<WorkspaceMemberResponse>>(`/api/v1/workspaces/${authStore.activeWorkspaceId}/members?${query.toString()}`, {
                 headers: { 'X-Workspace-Id': authStore.activeWorkspaceId }
