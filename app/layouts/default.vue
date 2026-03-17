@@ -11,7 +11,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Calendar,
-  CheckSquare
+  CheckSquare,
+  Lock
 } from 'lucide-vue-next'
 import MainSidebarNavigation from '~/components/molecules/MainSidebarNavigation.vue'
 import TopHeader from '~/components/organisms/TopHeader.vue'
