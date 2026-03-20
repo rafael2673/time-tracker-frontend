@@ -45,6 +45,7 @@ onUnmounted(() => {
 <template>
     <div class="relative" ref="selectRef">
         <button
+            type="button"
             @click="toggleDropdown"
             class="flex items-center justify-between w-full px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer group h-10"
         >
@@ -66,6 +67,7 @@ onUnmounted(() => {
             <div v-if="isOpen" class="absolute top-full left-0 mt-2 w-full bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl shadow-xl overflow-hidden z-60">
                 <div class="p-1.5 space-y-0.5 max-h-60 overflow-y-auto">
                     <button
+                        type="button"
                         v-for="opt in options"
                         :key="opt.value"
                         @click="selectOption(opt.value)"

@@ -8,6 +8,9 @@ export interface WorkPolicy {
     dailyMinutesLimit: number
     toleranceMinutes: number
     workingDays: string
+    overtimeStrategy: string
+    maxBankHoursPerMonth: number
+    bankExpirationMonths: number
 }
 
 export interface WorkPolicyRequest {
@@ -15,6 +18,9 @@ export interface WorkPolicyRequest {
     dailyMinutesLimit: number
     toleranceMinutes: number
     workingDays: string
+    overtimeStrategy: string
+    maxBankHoursPerMonth: number
+    bankExpirationMonths: number
 }
 
 export const usePoliciesStore = defineStore('policies', () => {

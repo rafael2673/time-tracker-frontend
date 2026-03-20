@@ -5,6 +5,7 @@ import { useAuthStore } from './auth'
 
 export interface MonthlyClosureResponse {
     id: string
+    userId: string
     employeeName: string
     year: number
     month: number
@@ -13,6 +14,7 @@ export interface MonthlyClosureResponse {
     rawBalance: number
     paidOvertimeHours: number
     bankedHoursDelta: number
+    accumulatedBankHours: number
     closedAt: string
 }
 
@@ -54,5 +56,43 @@ export const useClosuresStore = defineStore('closures', () => {
         }
     }
 
-    return { closures, isLoading, isClosed, fetchClosures, executeClosure }
+    async function downloadTimesheet(userId: string, employeeName: string, year: number, month: number): Promise<void> {
+        if (!authStore.token || !authStore.activeWorkspaceId) {
+            throw new Error('Missing authentication or workspace context')
+        }
+
+        const query = new URLSearchParams({
+            userId,
+            year: String(year),
+            month: String(month)
+        })
+
+        const response = await fetch(`/api/v1/reports/timesheet?${query.toString()}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authStore.token}`,
+                'X-Workspace-Id': authStore.activeWorkspaceId
+            }
+        })
+
+        if (!response.ok) {
+            throw new Error('Failed to download timesheet')
+        }
+
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+
+        const formattedMonth = String(month).padStart(2, '0')
+        const safeEmployeeName = employeeName.replace(/[^a-z0-9]/gi, '_').toLowerCase()
+        a.download = `${safeEmployeeName}_${formattedMonth}-${year}.xlsx`
+
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+    }
+
+    return { closures, isLoading, isClosed, downloadTimesheet, fetchClosures, executeClosure }
 })

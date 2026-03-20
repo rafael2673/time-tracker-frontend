@@ -20,12 +20,29 @@ const policyToDelete = ref<string | null>(null)
 const isDeleting = ref<boolean>(false)
 
 const editingId = ref<string | null>(null)
-const formData = ref({
+type PolicyFormData = {
+  name: string
+  dailyTime: string
+  toleranceMinutes: number
+  overtimeStrategy: string
+  maxBankHoursPerMonth: number
+  bankExpirationMonths: number
+  workingDays: string[]
+}
+
+function createDefaultFormData(workingDays: string[] = []): PolicyFormData {
+  return {
     name: '',
     dailyTime: '08:00',
     toleranceMinutes: 10,
-    workingDays: [] as string[]
-})
+    overtimeStrategy: 'BANK_ONLY',
+    maxBankHoursPerMonth: 0,
+    bankExpirationMonths: 0,
+    workingDays
+  }
+}
+
+const formData = ref<PolicyFormData>(createDefaultFormData())
 
 const availableDays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']
 
@@ -52,12 +69,7 @@ function parseTimeToMinutes(timeStr: string): number {
 
 function openCreateModal(): void {
     editingId.value = null
-    formData.value = {
-        name: '',
-        dailyTime: '08:00',
-        toleranceMinutes: 10,
-        workingDays: ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY']
-    }
+    formData.value = createDefaultFormData(['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'])
     errorMessage.value = ''
     isModalOpen.value = true
 }
@@ -65,9 +77,13 @@ function openCreateModal(): void {
 function openEditModal(policy: WorkPolicy): void {
     editingId.value = policy.id
     formData.value = {
+        ...createDefaultFormData(),
         name: policy.name,
         dailyTime: formatMinutesToTime(policy.dailyMinutesLimit),
         toleranceMinutes: policy.toleranceMinutes,
+        overtimeStrategy: policy.overtimeStrategy,
+        maxBankHoursPerMonth: policy.maxBankHoursPerMonth,
+        bankExpirationMonths: policy.bankExpirationMonths,
         workingDays: policy.workingDays ? policy.workingDays.split(',') : []
     }
     errorMessage.value = ''
@@ -131,6 +147,9 @@ async function handleSubmit(): Promise<void> {
         name: formData.value.name,
         dailyMinutesLimit: parseTimeToMinutes(formData.value.dailyTime),
         toleranceMinutes: Number(formData.value.toleranceMinutes),
+        overtimeStrategy: formData.value.overtimeStrategy,
+        maxBankHoursPerMonth: Number(formData.value.maxBankHoursPerMonth),
+        bankExpirationMonths: Number(formData.value.bankExpirationMonths),
         workingDays: formData.value.workingDays.join(',')
     }
 
