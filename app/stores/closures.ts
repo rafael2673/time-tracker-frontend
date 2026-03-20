@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { api } from '~/utils/api'
 import { useAuthStore } from './auth'
+import {useLocale} from "~/composables/useLocale";
 
 export interface MonthlyClosureResponse {
     id: string
@@ -23,6 +24,7 @@ export const useClosuresStore = defineStore('closures', () => {
     const closures = ref<MonthlyClosureResponse[]>([])
     const isLoading = ref(false)
     const isClosed = ref(false)
+    const { locale } = useLocale()
 
     async function fetchClosures(year: number, month: number) {
         if (!authStore.activeWorkspaceId) return
@@ -71,7 +73,8 @@ export const useClosuresStore = defineStore('closures', () => {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${authStore.token}`,
-                'X-Workspace-Id': authStore.activeWorkspaceId
+                'X-Workspace-Id': authStore.activeWorkspaceId,
+                'Accept-Language': locale.value,
             }
         })
 
