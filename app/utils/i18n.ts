@@ -253,7 +253,21 @@ export const translations = {
             save: 'Salvar Alterações',
             success: 'Perfil atualizado com sucesso!',
             error: 'Erro ao atualizar o perfil.',
-            noEmailLinked: 'Nenhum e-mail vinculado'
+            noEmailLinked: 'Nenhum e-mail vinculado',
+            subtitle: 'Gerencie as integrações e chaves de acesso da sua empresa.',
+            integrationTitle: 'Integração do Widget',
+            integrationDesc: 'Use esta chave para conectar o tablet ou totem da recepção ao sistema. Nunca compartilhe esta chave publicamente.',
+            apiKeyLabel: 'Chave de Acesso (API Key)',
+            generateNew: 'Gerar Nova Chave',
+            copy: 'Copiar',
+            copied: 'Copiado!',
+            noKey: 'Nenhuma chave gerada. Clique em gerar para começar.',
+            warningTitle: 'Atenção ao rotacionar a chave',
+            warningDesc: 'Ao gerar uma nova chave, todos os widgets que usam a chave antiga serão desconectados imediatamente.',
+            confirmGenerateTitle: 'Gerar Nova Chave?',
+            confirmGenerateMsg: 'Você tem certeza? Os dispositivos atuais perderão o acesso até que você atualize a chave neles.',
+            successGenerate: 'Nova chave gerada com sucesso!',
+            errorGenerate: 'Erro ao gerar nova chave.'
         },
         workspaces: {
             selectorPlaceholder: 'Selecione a Empresa'
@@ -516,7 +530,21 @@ export const translations = {
             save: 'Save Changes',
             success: 'Profile updated successfully!',
             error: 'Error updating profile.',
-            noEmailLinked: 'No email linked'
+            noEmailLinked: 'No email linked',
+            subtitle: 'Manage your company\'s integrations and access keys.',
+            integrationTitle: 'Widget Integration',
+            integrationDesc: 'Use this key to connect the reception tablet or kiosk to the system. Never share this key publicly.',
+            apiKeyLabel: 'Access Key (API Key)',
+            generateNew: 'Generate New Key',
+            copy: 'Copy',
+            copied: 'Copied!',
+            noKey: 'No key generated. Click generate to start.',
+            warningTitle: 'Attention when rotating the key',
+            warningDesc: 'By generating a new key, all widgets using the old key will be disconnected immediately.',
+            confirmGenerateTitle: 'Generate New Key?',
+            confirmGenerateMsg: 'Are you sure? Current devices will lose access until you update the key on them.',
+            successGenerate: 'New key generated successfully!',
+            errorGenerate: 'Error generating new key.'
         },
         workspaces: {
             selectorPlaceholder: 'Select Workspace'

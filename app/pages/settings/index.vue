@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import { useLocale } from '~/composables/useLocale'
 import SettingsProfileForm from '~/components/organisms/SettingsProfileForm.vue'
+import SettingsApiKey from '~/components/organisms/SettingsApiKey.vue'
 
 const authStore = useAuthStore()
 const { t } = useLocale()
@@ -42,7 +43,10 @@ async function handleSubmit() {
 
 <template>
     <div class="flex flex-col gap-6 max-w-3xl">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{{ t.settings.title }}</h1>
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{{ t.settings.title }}</h1>
+            <p v-if="t.settings.subtitle" class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{{ t.settings.subtitle }}</p>
+        </div>
 
         <SettingsProfileForm
                 :full-name="fullName"
@@ -55,5 +59,7 @@ async function handleSubmit() {
                 :on-update-recovery-email="val => recoveryEmail = val"
                 :on-submit="handleSubmit"
         />
+
+        <SettingsApiKey />
     </div>
 </template>
