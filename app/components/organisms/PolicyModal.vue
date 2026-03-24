@@ -28,6 +28,13 @@ const strategyOptions = computed(() => [
   { value: 'PAY_ONLY', label: t.value.policies.strategyPayOnly },
   { value: 'MIXED', label: t.value.policies.strategyMixed }
 ])
+
+function getStrategyDescription(strategy: string): string {
+  if (strategy === 'BANK_ONLY') return t.value.policies.descBankOnly
+  if (strategy === 'PAY_ONLY') return t.value.policies.descPayOnly
+  if (strategy === 'MIXED') return t.value.policies.descMixed
+  return ''
+}
 </script>
 
 <template>
@@ -75,6 +82,9 @@ const strategyOptions = computed(() => [
                 v-model="props.formData.overtimeStrategy"
                 :options="strategyOptions"
             />
+            <div class="mt-2 text-xs text-gray-600 dark:text-gray-400 bg-indigo-50/50 dark:bg-indigo-900/10 border-l-2 border-indigo-400 dark:border-indigo-500 pl-3 py-2 rounded-r-lg font-medium leading-relaxed">
+               {{ getStrategyDescription(props.formData.overtimeStrategy) }}
+            </div>
           </div>
 
           <div class="grid grid-cols-2 gap-4" v-if="props.formData.overtimeStrategy !== 'PAY_ONLY'">

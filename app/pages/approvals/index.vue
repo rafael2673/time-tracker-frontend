@@ -100,10 +100,10 @@ async function executeAction() {
 
       <div class="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl w-fit">
         <button @click="activeTab = 'pending'" class="px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer" :class="activeTab === 'pending' ? 'bg-white dark:bg-gray-900 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500'">
-          <Clock :size="16"/> Pendentes
+          <Clock :size="16"/> {{ t.approvals.pending }}
         </button>
         <button @click="activeTab = 'history'" class="px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer" :class="activeTab === 'history' ? 'bg-white dark:bg-gray-900 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500'">
-          <History :size="16"/> Histórico
+          <History :size="16"/> {{ t.approvals.history }}
         </button>
       </div>
     </div>
