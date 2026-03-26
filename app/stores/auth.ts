@@ -1,7 +1,7 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { api } from '~/utils/api'
+import {defineStore} from 'pinia'
+import {computed, ref} from 'vue'
+import {useRouter} from 'vue-router'
+import {api} from '~/utils/api'
 
 interface AuthResponse {
     accessToken?: string
@@ -46,8 +46,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     async function fetchProfile(): Promise<void> {
         try {
-            const response = await api<UserProfile>('/api/v1/users/me')
-            user.value = response
+            user.value = await api<UserProfile>('/api/v1/users/me')
         } catch (error) {
             console.error('Failed to fetch profile', error)
         }
