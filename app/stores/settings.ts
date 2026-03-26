@@ -7,6 +7,7 @@ export const useSettingsStore = defineStore('settings', () => {
     const authStore = useAuthStore()
     const currentApiKey = ref<string>('')
     const isLoading = ref(false)
+    const isKeyNewlyGenerated = ref(false)
 
     async function fetchApiKey() {
         if (!authStore.activeWorkspaceId) return
@@ -16,6 +17,7 @@ export const useSettingsStore = defineStore('settings', () => {
                 headers: { 'X-Workspace-Id': authStore.activeWorkspaceId }
             })
             currentApiKey.value = response.apiKey
+            isKeyNewlyGenerated.value = false
         } catch (error) {
             currentApiKey.value = ''
         } finally {
@@ -32,6 +34,7 @@ export const useSettingsStore = defineStore('settings', () => {
                 headers: { 'X-Workspace-Id': authStore.activeWorkspaceId }
             })
             currentApiKey.value = response.apiKey
+            isKeyNewlyGenerated.value = true
             return true
         } catch (error) {
             return false
@@ -43,6 +46,7 @@ export const useSettingsStore = defineStore('settings', () => {
     return {
         currentApiKey,
         isLoading,
+        isKeyNewlyGenerated,
         fetchApiKey,
         generateNewApiKey
     }
