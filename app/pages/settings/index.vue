@@ -4,6 +4,7 @@ import { useAuthStore } from '~/stores/auth'
 import { useLocale } from '~/composables/useLocale'
 import SettingsProfileForm from '~/components/organisms/SettingsProfileForm.vue'
 import SettingsApiKey from '~/components/organisms/SettingsApiKey.vue'
+import SettingsAutoClosure from "~/components/organisms/SettingsAutoClosure.vue";
 
 const authStore = useAuthStore()
 const { t } = useLocale()
@@ -60,6 +61,7 @@ async function handleSubmit() {
                 :on-submit="handleSubmit"
         />
 
-        <SettingsApiKey />
+        <SettingsApiKey v-if="authStore.isManager"/>
+        <SettingsAutoClosure v-if="authStore.isManager" />
     </div>
 </template>

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '~/utils/api'
 
@@ -25,6 +25,9 @@ export const useAuthStore = defineStore('auth', () => {
 
     const router = useRouter()
 
+    const isAdmin = computed(() => user.value?.role === 'ADMIN')
+    const isManager = computed(() => user.value?.role === 'MANAGER' || user.value?.role === 'ADMIN')
+
     function setToken(newToken: string | null): void {
         token.value = newToken
         isAuthenticated.value = !!newToken
@@ -43,8 +46,8 @@ export const useAuthStore = defineStore('auth', () => {
 
     async function fetchProfile(): Promise<void> {
         try {
-            // Em breve criaremos a rota /api/v1/users/me no backend para popular isso
-            // user.value = await api<UserProfile>('/api/v1/users/me')
+            const response = await api<UserProfile>('/api/v1/users/me')
+            user.value = response
         } catch (error) {
             console.error('Failed to fetch profile', error)
         }
@@ -143,6 +146,8 @@ export const useAuthStore = defineStore('auth', () => {
         isAuthenticated,
         user,
         activeWorkspaceId,
+        isAdmin,
+        isManager,
         setActiveWorkspace,
         updateProfile,
         login,

@@ -274,7 +274,31 @@ export const translations = {
             confirmGenerateTitle: 'Gerar Nova Chave?',
             confirmGenerateMsg: 'Você tem certeza? Os dispositivos atuais perderão o acesso até que você atualize a chave neles.',
             successGenerate: 'Nova chave gerada com sucesso!',
-            errorGenerate: 'Erro ao gerar nova chave.'
+            errorGenerate: 'Erro ao gerar nova chave.',
+            autoClosure: {
+                title: 'Fechamento Automático',
+                subtitle: 'Motor de congelamento mensal',
+                targetDayLabel: 'Dia de Execução Alvo',
+                countTypeLabel: 'Tipo de Contagem',
+                shiftRuleLabel: 'Regra de Fim de Semana/Feriado',
+                pendingStrategyLabel: 'Estratégia para Pendências',
+                infoText: 'O serviço de fechamento é executado diariamente às 02:00 AM. Se as regras matemáticas do motor confirmarem que hoje é o dia alvo (descontando feriados cadastrados do sistema), a folha do mês anterior será congelada permanentemente.',
+                saveRules: 'Salvar Regras',
+                successUpdate: 'Configurações de fechamento atualizadas',
+                errorSave: 'Erro ao salvar',
+                countTypeOptions: {
+                    calendarDays: 'Dias Corridos',
+                    businessDays: 'Dias Úteis'
+                },
+                shiftRuleOptions: {
+                    shiftBackward: 'Antecipar (Dia Útil Anterior)',
+                    shiftForward: 'Postergar (Próximo Dia Útil)'
+                },
+                pendingStrategyOptions: {
+                    blocking: 'Bloquear Fechamento (Alerta Gestor)',
+                    forceClose: 'Forçar Fechamento (Rejeita Pendências)'
+                }
+            }
         },
         workspaces: {
             selectorPlaceholder: 'Selecione a Empresa'
@@ -558,7 +582,31 @@ export const translations = {
             confirmGenerateTitle: 'Generate New Key?',
             confirmGenerateMsg: 'Are you sure? Current devices will lose access until you update the key on them.',
             successGenerate: 'New key generated successfully!',
-            errorGenerate: 'Error generating new key.'
+            errorGenerate: 'Error generating new key.',
+            autoClosure: {
+                title: 'Automatic Closure',
+                subtitle: 'Monthly freeze engine',
+                targetDayLabel: 'Target Execution Day',
+                countTypeLabel: 'Count Type',
+                shiftRuleLabel: 'Weekend/Holiday Rule',
+                pendingStrategyLabel: 'Pending Strategy',
+                infoText: 'The closure service runs daily at 02:00 AM. If the mathematical engine rules confirm that today is the target day (discounting registered system holidays), the previous month\'s timesheet will be permanently frozen.',
+                saveRules: 'Save Rules',
+                successUpdate: 'Closure settings updated',
+                errorSave: 'Error saving',
+                countTypeOptions: {
+                    calendarDays: 'Calendar Days',
+                    businessDays: 'Business Days'
+                },
+                shiftRuleOptions: {
+                    shiftBackward: 'Shift Backward (Previous Business Day)',
+                    shiftForward: 'Shift Forward (Next Business Day)'
+                },
+                pendingStrategyOptions: {
+                    blocking: 'Blocking (Manager Alert)',
+                    forceClose: 'Force Close (Reject Pendings)'
+                }
+            }
         },
         workspaces: {
             selectorPlaceholder: 'Select Workspace'
