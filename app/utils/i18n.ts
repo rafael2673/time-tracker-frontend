@@ -114,6 +114,12 @@ export const translations = {
             downloadSuccess: 'Folha de ponto gerada com sucesso.',
             downloadError: 'Erro ao gerar o arquivo. Tente novamente.',
             exportTimesheet: 'Exportar folha em Excel',
+            exporting: 'Exportando Folhas',
+            starting: 'Iniciando...',
+            completed: 'concluído',
+            downloading: 'Baixando arquivo...',
+            failed: 'Falha na exportação',
+            exportAll: 'Exportar Lote (ZIP)'
         },
         calendar: {
             title: 'Feriados e Datas Especiais',
@@ -392,6 +398,12 @@ export const translations = {
             downloadSuccess: 'Timesheet generated successfully.',
             downloadError: 'Error generating the file. Please try again.',
             exportTimesheet: 'Export timesheet as Excel',
+            exporting: 'Exporting Timesheets',
+            starting: 'Starting...',
+            completed: 'completed',
+            downloading: 'Downloading file...',
+            failed: 'Export failed',
+            exportAll: 'Export Batch (ZIP)'
         },
         calendar: {
             title: 'Holidays and Special Dates',

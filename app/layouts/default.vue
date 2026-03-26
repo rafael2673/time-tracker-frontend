@@ -16,6 +16,7 @@ import {
 } from 'lucide-vue-next'
 import MainSidebarNavigation from '~/components/molecules/MainSidebarNavigation.vue'
 import TopHeader from '~/components/organisms/TopHeader.vue'
+import ExportProgressToast from "~/components/molecules/ExportProgressToast.vue";
 
 const authStore = useAuthStore()
 const workspaceStore = useWorkspaceStore()
@@ -117,5 +118,6 @@ function toggleSidebar() {
         <slot />
       </div>
     </main>
+    <ExportProgressToast />
   </div>
 </template>

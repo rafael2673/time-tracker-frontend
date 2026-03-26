@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
-import { Loader2, Lock, CalendarDays, FileText, CheckCircle2, FileDown } from 'lucide-vue-next'
+import { Loader2, Lock, CalendarDays, FileText, CheckCircle2, FileDown, Archive } from 'lucide-vue-next'
 import { useClosuresStore } from '~/stores/closures'
 import { useAuthStore } from '~/stores/auth'
+import { useExportStore } from '~/stores/export'
 import { useLocale } from '~/composables/useLocale'
 import BaseSelect from '~/components/atoms/BaseSelect.vue'
 import ConfirmModal from '~/components/molecules/ConfirmModal.vue'
@@ -10,7 +11,8 @@ import { formatDecimalHours } from '~/utils/timeFormatter'
 
 const closuresStore = useClosuresStore()
 const authStore = useAuthStore()
-const { t } = useLocale()
+const exportStore = useExportStore()
+const { t, locale } = useLocale()
 
 const currentDate = new Date()
 const selectedYear = ref(currentDate.getFullYear())
@@ -84,6 +86,10 @@ async function handleDownload(userId: string, employeeName: string) {
     downloadingId.value = null
   }
 }
+
+function handleBulkExport() {
+  exportStore.startBulkExport(selectedYear.value, selectedMonth.value, locale.value)
+}
 </script>
 
 <template>
@@ -96,6 +102,15 @@ async function handleDownload(userId: string, employeeName: string) {
       <div class="flex flex-wrap items-center gap-3">
         <div class="w-32"><BaseSelect v-model="selectedYear" :options="yearOptions" /></div>
         <div class="w-44"><BaseSelect v-model="selectedMonth" :options="monthOptions" /></div>
+
+        <button
+            @click="handleBulkExport"
+            :disabled="exportStore.isExporting || closuresStore.isLoading || closuresStore.closures.length === 0"
+            class="px-4 py-2.5 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 font-bold rounded-xl border border-indigo-100 dark:border-indigo-800/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors disabled:opacity-50 cursor-pointer active:scale-95 flex items-center gap-2 h-10.5"
+        >
+          <Archive :size="16" />
+          {{ t.closures?.exportAll }}
+        </button>
 
         <button v-if="!closuresStore.isClosed && !closuresStore.isLoading" @click="isConfirmModalOpen = true" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-105 active:scale-95 h-10.5">
           <Lock :size="16" />
@@ -184,46 +199,46 @@ async function handleDownload(userId: string, employeeName: string) {
 
         <div class="hidden md:block overflow-x-auto">
           <table class="min-w-275 w-full text-left border-collapse whitespace-nowrap">
-          <thead>
-          <tr class="border-b border-gray-100 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-800/10">
-            <th class="px-3 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 w-1/4">{{ t.closures.employee }}</th>
-            <th class="px-3 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 text-right">{{ t.closures.worked }}</th>
-            <th class="px-3 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 text-right">{{ t.closures.expected }}</th>
-            <th class="px-3 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 text-right">{{ t.closures.balance }}</th>
-            <th class="px-3 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest text-indigo-400 dark:text-indigo-500 text-right">{{ t.closures.bankedMonth }}</th>
-            <th class="px-3 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 text-right border-l border-gray-100 dark:border-gray-800 bg-indigo-50/30 dark:bg-indigo-900/10">{{ t.closures.bankedTotal }}</th>
-            <th class="px-3 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 text-right">{{ t.closures.overtime }}</th>
-            <th class="px-3 sm:px-6 py-4 w-16"></th>
-          </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-          <tr v-for="c in closuresStore.closures" :key="c.id" class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors group">
-            <td class="px-3 sm:px-6 py-4 font-bold text-gray-900 dark:text-white truncate" :title="c.employeeName">{{ c.employeeName }}</td>
-            <td class="px-3 sm:px-6 py-4 text-right font-medium text-gray-600 dark:text-gray-300">{{ formatDecimalHours(c.workedHours) }}</td>
-            <td class="px-3 sm:px-6 py-4 text-right font-medium text-gray-600 dark:text-gray-300">{{ formatDecimalHours(c.expectedHours) }}</td>
-            <td class="px-3 sm:px-6 py-4 text-right font-bold" :class="c.rawBalance < 0 ? 'text-red-500' : (c.rawBalance > 0 ? 'text-emerald-500' : 'text-gray-500')">
-              {{ c.rawBalance > 0 ? '+' : '' }}{{ formatDecimalHours(c.rawBalance) }}
-            </td>
-            <td class="px-3 sm:px-6 py-4 text-right font-bold text-indigo-400 dark:text-indigo-500">
-              {{ c.bankedHoursDelta > 0 ? '+' : '' }}{{ formatDecimalHours(c.bankedHoursDelta) }}
-            </td>
-            <td class="px-3 sm:px-6 py-4 text-right font-black text-indigo-600 dark:text-indigo-400 border-l border-gray-100 dark:border-gray-800 bg-indigo-50/30 dark:bg-indigo-900/10">
-              {{ c.accumulatedBankHours > 0 ? '+' : '' }}{{ formatDecimalHours(c.accumulatedBankHours) }}
-            </td>
-            <td class="px-3 sm:px-6 py-4 text-right font-bold text-emerald-600 dark:text-emerald-400">{{ formatDecimalHours(c.paidOvertimeHours) }}</td>
-            <td class="px-3 sm:px-6 py-4 text-right">
-              <button
-                  @click="handleDownload(c.userId, c.employeeName)"
-                  :disabled="downloadingId === c.userId"
-                  class="p-2 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all opacity-0 group-hover:opacity-100 disabled:opacity-50"
-                  :title="t.closures.exportTimesheet"
-              >
-                <Loader2 v-if="downloadingId === c.userId" :size="18" class="animate-spin text-indigo-600" />
-                <FileDown v-else :size="18" />
-              </button>
-            </td>
-          </tr>
-          </tbody>
+            <thead>
+            <tr class="border-b border-gray-100 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-800/10">
+              <th class="px-3 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 w-1/4">{{ t.closures.employee }}</th>
+              <th class="px-3 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 text-right">{{ t.closures.worked }}</th>
+              <th class="px-3 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 text-right">{{ t.closures.expected }}</th>
+              <th class="px-3 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 text-right">{{ t.closures.balance }}</th>
+              <th class="px-3 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest text-indigo-400 dark:text-indigo-500 text-right">{{ t.closures.bankedMonth }}</th>
+              <th class="px-3 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 text-right border-l border-gray-100 dark:border-gray-800 bg-indigo-50/30 dark:bg-indigo-900/10">{{ t.closures.bankedTotal }}</th>
+              <th class="px-3 sm:px-6 py-4 text-xs font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 text-right">{{ t.closures.overtime }}</th>
+              <th class="px-3 sm:px-6 py-4 w-16"></th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+            <tr v-for="c in closuresStore.closures" :key="c.id" class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors group">
+              <td class="px-3 sm:px-6 py-4 font-bold text-gray-900 dark:text-white truncate" :title="c.employeeName">{{ c.employeeName }}</td>
+              <td class="px-3 sm:px-6 py-4 text-right font-medium text-gray-600 dark:text-gray-300">{{ formatDecimalHours(c.workedHours) }}</td>
+              <td class="px-3 sm:px-6 py-4 text-right font-medium text-gray-600 dark:text-gray-300">{{ formatDecimalHours(c.expectedHours) }}</td>
+              <td class="px-3 sm:px-6 py-4 text-right font-bold" :class="c.rawBalance < 0 ? 'text-red-500' : (c.rawBalance > 0 ? 'text-emerald-500' : 'text-gray-500')">
+                {{ c.rawBalance > 0 ? '+' : '' }}{{ formatDecimalHours(c.rawBalance) }}
+              </td>
+              <td class="px-3 sm:px-6 py-4 text-right font-bold text-indigo-400 dark:text-indigo-500">
+                {{ c.bankedHoursDelta > 0 ? '+' : '' }}{{ formatDecimalHours(c.bankedHoursDelta) }}
+              </td>
+              <td class="px-3 sm:px-6 py-4 text-right font-black text-indigo-600 dark:text-indigo-400 border-l border-gray-100 dark:border-gray-800 bg-indigo-50/30 dark:bg-indigo-900/10">
+                {{ c.accumulatedBankHours > 0 ? '+' : '' }}{{ formatDecimalHours(c.accumulatedBankHours) }}
+              </td>
+              <td class="px-3 sm:px-6 py-4 text-right font-bold text-emerald-600 dark:text-emerald-400">{{ formatDecimalHours(c.paidOvertimeHours) }}</td>
+              <td class="px-3 sm:px-6 py-4 text-right">
+                <button
+                    @click="handleDownload(c.userId, c.employeeName)"
+                    :disabled="downloadingId === c.userId"
+                    class="p-2 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all opacity-0 group-hover:opacity-100 disabled:opacity-50"
+                    :title="t.closures.exportTimesheet"
+                >
+                  <Loader2 v-if="downloadingId === c.userId" :size="18" class="animate-spin text-indigo-600" />
+                  <FileDown v-else :size="18" />
+                </button>
+              </td>
+            </tr>
+            </tbody>
           </table>
         </div>
       </div>
