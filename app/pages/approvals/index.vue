@@ -8,6 +8,7 @@ import PaginationControls from '~/components/molecules/PaginationControls.vue'
 import ConfirmModal from '~/components/molecules/ConfirmModal.vue'
 import FilterBar from '~/components/molecules/FilterBar.vue'
 import ApprovalCard from '~/components/molecules/ApprovalCard.vue'
+import BaseSelect from '~/components/atoms/BaseSelect.vue'
 
 const approvalsStore = useApprovalsStore()
 const authStore = useAuthStore()
@@ -16,6 +17,7 @@ const { t } = useLocale()
 const activeTab = ref<'pending' | 'history'>('pending')
 const searchQuery = ref('')
 const filterDate = ref('')
+const filterStatus = ref('')
 
 const isConfirmModalOpen = ref(false)
 const isProcessing = ref(false)
@@ -28,6 +30,12 @@ const currentRecords = computed(() => {
   return activeTab.value === 'pending' ? approvalsStore.pendingRecords : approvalsStore.historyRecords
 })
 
+const statusOptions = computed(() => [
+  { value: '', label: t.value.approvals.statusAll },
+  { value: 'APPROVED', label: t.value.approvals.statusApproved },
+  { value: 'REJECTED', label: t.value.approvals.statusRejected }
+])
+
 onMounted(() => {
   if (authStore.activeWorkspaceId) loadData(0)
 })
@@ -36,6 +44,7 @@ watch(() => authStore.activeWorkspaceId, (newVal) => {
   if (newVal) {
     searchQuery.value = ''
     filterDate.value = ''
+    filterStatus.value = ''
     loadData(0)
   }
 })
@@ -43,14 +52,17 @@ watch(() => authStore.activeWorkspaceId, (newVal) => {
 watch(activeTab, () => {
   searchQuery.value = ''
   filterDate.value = ''
+  filterStatus.value = ''
   loadData(0)
 })
+
+watch(filterStatus, () => loadData(0))
 
 function loadData(page: number = 0) {
   if (activeTab.value === 'pending') {
     approvalsStore.fetchPending(page, searchQuery.value)
   } else {
-    approvalsStore.fetchHistory(page, searchQuery.value, filterDate.value)
+    approvalsStore.fetchHistory(page, searchQuery.value, filterDate.value, filterStatus.value)
   }
 }
 
@@ -98,17 +110,23 @@ async function executeAction() {
         <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{{ t.approvals.subtitle }}</p>
       </div>
 
-      <div class="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl w-fit">
-        <button @click="activeTab = 'pending'" class="px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer" :class="activeTab === 'pending' ? 'bg-white dark:bg-gray-900 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500'">
-          <Clock :size="16"/> {{ t.approvals.pending }}
-        </button>
-        <button @click="activeTab = 'history'" class="px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer" :class="activeTab === 'history' ? 'bg-white dark:bg-gray-900 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500'">
-          <History :size="16"/> {{ t.approvals.history }}
-        </button>
+      <div class="flex flex-col md:flex-row items-center gap-3">
+        <div v-if="activeTab === 'history'" class="w-full md:w-44">
+          <BaseSelect v-model="filterStatus" :options="statusOptions" />
+        </div>
+
+        <div class="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl w-full md:w-fit justify-between md:justify-start">
+          <button @click="activeTab = 'pending'" class="flex-1 md:flex-none px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer" :class="activeTab === 'pending' ? 'bg-white dark:bg-gray-900 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500'">
+            <Clock :size="16"/> {{ t.approvals.pending }}
+          </button>
+          <button @click="activeTab = 'history'" class="flex-1 md:flex-none px-4 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer" :class="activeTab === 'history' ? 'bg-white dark:bg-gray-900 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500'">
+            <History :size="16"/> {{ t.approvals.history }}
+          </button>
+        </div>
       </div>
     </div>
 
-    <div v-if="message" class="p-4 text-sm font-bold rounded-xl border" :class="messageType === 'success' ? 'bg-green-50 text-green-700 border-green-100 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800/50' : 'bg-red-50 text-red-600 border-red-100 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800/50'">
+    <div v-if="message" class="p-4 text-sm font-bold rounded-xl border animate-in fade-in duration-300" :class="messageType === 'success' ? 'bg-green-50 text-green-700 border-green-100 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800/50' : 'bg-red-50 text-red-600 border-red-100 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800/50'">
       {{ message }}
     </div>
 

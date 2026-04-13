@@ -24,8 +24,8 @@ function formatDate(isoString: string) {
 }
 
 function getTypeTranslation(type: string): string {
-  const typesMap = t.value.approvals.types as Record<string, string>
-  return typesMap[type] || type
+  const typesMap = t.value.approvals?.types as Record<string, string>
+  return typesMap?.[type] || type
 }
 </script>
 
@@ -49,7 +49,18 @@ function getTypeTranslation(type: string): string {
         <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mt-1">{{ props.record.justification }}</p>
       </div>
 
-      <div v-if="!props.isHistory" class="flex items-stretch gap-3 w-full lg:w-auto shrink-0">
+      <div v-if="props.isHistory" class="flex items-stretch gap-3 w-full lg:w-auto shrink-0 mt-2 lg:mt-0">
+        <div v-if="props.record.rejected" class="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 font-bold rounded-2xl border border-red-100 dark:border-red-900/30 py-3 lg:py-0">
+          <XCircle :size="18" />
+          <span class="hidden sm:inline">{{ t.approvals.rejectedStatus }}</span>
+        </div>
+        <div v-else class="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 font-bold rounded-2xl border border-emerald-100 dark:border-emerald-900/30 py-3 lg:py-0">
+          <CheckCircle2 :size="18" />
+          <span class="hidden sm:inline">{{ t.approvals.approvedStatus }}</span>
+        </div>
+      </div>
+
+      <div v-else class="flex items-stretch gap-3 w-full lg:w-auto shrink-0 mt-2 lg:mt-0">
         <button @click="emit('reject', props.record.id)" class="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/40 dark:text-red-400 font-bold rounded-2xl transition-colors cursor-pointer border border-red-100 dark:border-red-900/30 py-3 lg:py-0">
           <XCircle :size="18" />
           <span class="hidden sm:inline">{{ t.approvals.reject }}</span>

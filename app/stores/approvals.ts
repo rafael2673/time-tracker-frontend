@@ -10,6 +10,7 @@ export interface PendingRecordResponse {
     recordType: string
     registeredAt: string
     justification: string
+    rejected: boolean
 }
 
 export const useApprovalsStore = defineStore('approvals', () => {
@@ -43,22 +44,26 @@ export const useApprovalsStore = defineStore('approvals', () => {
         }
     }
 
-    async function fetchHistory(page: number = 0, search: string = '', date: string = '') {
+    async function fetchHistory(page: number, search: string = '', date: string = '', status: string = '') {
         if (!authStore.activeWorkspaceId) return
         isLoading.value = true
         try {
-            const query = new URLSearchParams({ page: String(page), size: '10' })
-            if (search) query.append('search', search)
-            if (date) query.append('date', date)
+            const params = new URLSearchParams({
+                page: page.toString(),
+                size: '10'
+            })
 
-            const response = await api<PageResponse<PendingRecordResponse>>(`/api/v1/records/history?${query.toString()}`, {
+            if (search) params.append('search', search)
+            if (date) params.append('date', date)
+            if (status) params.append('status', status)
+
+            const response = await api<PageResponse<PendingRecordResponse>>(`/api/v1/records/history?${params.toString()}`, {
                 headers: { 'X-Workspace-Id': authStore.activeWorkspaceId }
             })
 
             historyRecords.value = response.content
-            currentPage.value = response.number
             totalPages.value = response.totalPages
-            totalElements.value = response.totalElements
+            currentPage.value = response.number
         } catch (error) {
             historyRecords.value = []
         } finally {
@@ -83,7 +88,7 @@ export const useApprovalsStore = defineStore('approvals', () => {
         if (!authStore.activeWorkspaceId) return false
         try {
             await api(`/api/v1/records/${id}/reject`, {
-                method: 'DELETE',
+                method: 'PATCH',
                 headers: { 'X-Workspace-Id': authStore.activeWorkspaceId }
             })
             return true
