@@ -30,6 +30,18 @@ export interface DailySummaryResponse {
     date: string
 }
 
+export interface NextHolidayResponse {
+    name: string
+    date: string
+    multiplier: number
+}
+
+export interface AbsencePieChartResponse {
+    totalExpectedDays: number
+    totalAbsences: number
+    absencePercentage: number
+}
+
 export const useSummaryStore = defineStore('summary', () => {
     const authStore = useAuthStore()
     const { locale } = useLocale()
@@ -41,6 +53,50 @@ export const useSummaryStore = defineStore('summary', () => {
     const availableYears = ref<number[]>([])
 
     const isLoadingSummary = ref(false)
+
+    const nextHoliday = ref<NextHolidayResponse | null>(null)
+    const companyAbsences = ref<AbsencePieChartResponse | null>(null)
+    const companyYearlyAverage = ref<MonthSummaryResponse[]>([])
+
+    async function fetchNextHoliday() {
+        if (!authStore.activeWorkspaceId) return
+        try {
+            nextHoliday.value = await api<NextHolidayResponse>('/api/v1/summary/next-holiday', {
+                headers: { 'X-Workspace-Id': authStore.activeWorkspaceId }
+            })
+        } catch (error) {
+            nextHoliday.value = null
+        }
+    }
+
+    async function fetchCompanyAbsences(year: number, month: number) {
+        if (!authStore.activeWorkspaceId) return
+        try {
+            companyAbsences.value = await api<AbsencePieChartResponse>(`/api/v1/summary/company/absences?year=${year}&month=${month}`, {
+                headers: { 'X-Workspace-Id': authStore.activeWorkspaceId }
+            })
+        } catch (error) {
+            companyAbsences.value = null
+        }
+    }
+
+    async function fetchCompanyYearlyAverage(year: number, policyId?: string) {
+        if (!authStore.activeWorkspaceId) return
+        try {
+            const url = policyId
+                ? `/api/v1/summary/company/yearly?year=${year}&policyId=${policyId}`
+                : `/api/v1/summary/company/yearly?year=${year}`
+
+            companyYearlyAverage.value = await api<MonthSummaryResponse[]>(url, {
+                headers: {
+                    'X-Workspace-Id': authStore.activeWorkspaceId,
+                    'Accept-Language': locale.value
+                }
+            })
+        } catch (error) {
+            companyYearlyAverage.value = []
+        }
+    }
 
     async function fetchEmployeeSummary(employeeId: string) {
         if (!authStore.activeWorkspaceId) return
@@ -116,12 +172,18 @@ export const useSummaryStore = defineStore('summary', () => {
         monthlyBalance,
         yearlySummary,
         weeklySummary,
+        companyAbsences,
+        companyYearlyAverage,
         availableYears,
         isLoadingSummary,
+        nextHoliday,
         fetchEmployeeSummary,
         fetchMonthlyBalance,
         fetchYearlySummary,
         fetchWeeklySummary,
-        fetchAvailableYears
+        fetchAvailableYears,
+        fetchNextHoliday,
+        fetchCompanyAbsences,
+        fetchCompanyYearlyAverage
     }
 })

@@ -3,9 +3,9 @@ import { ChevronLeft, Loader2, Clock } from 'lucide-vue-next'
 import { useLocale } from '~/composables/useLocale'
 
 const props = defineProps<{
-  currentRole: string
-  selectedEmployee: any
-  isPunching: boolean
+  currentRole?: string
+  selectedEmployee?: any
+  isPunching?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -15,7 +15,7 @@ const emit = defineEmits<{
 
 const { t } = useLocale()
 
-function getInitials(name: string): string {
+function getInitials(name?: string): string {
   if (!name) return '?'
   const parts = name.trim().split(/\s+/)
   if (parts.length >= 2) {

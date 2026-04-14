@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { Users, Briefcase, Clock, Activity, Building2 } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth'
 import { useWorkspaceStore } from '~/stores/workspaces'
 import { useEmployeesStore } from '~/stores/employees'
 import { usePoliciesStore } from '~/stores/policies'
 import { useSummaryStore } from '~/stores/summary'
+import { useApprovalsStore } from '~/stores/approvals'
 import { useLocale } from '~/composables/useLocale'
 import { formatDecimalHours } from '~/utils/timeFormatter'
+
+import YearlyEvolutionChart from '~/components/organisms/YearlyEvolutionChart.vue'
+import AbsencePieChart from '~/components/organisms/AbsencePieChart.vue'
+import BaseSelect from '~/components/atoms/BaseSelect.vue'
 
 const props = defineProps<{
   onSelectEmployee: (id: string) => void
@@ -18,12 +23,45 @@ const workspaceStore = useWorkspaceStore()
 const employeesStore = useEmployeesStore()
 const policiesStore = usePoliciesStore()
 const summaryStore = useSummaryStore()
+const approvalsStore = useApprovalsStore()
 const { t } = useLocale()
+
+const selectedYear = ref(new Date().getFullYear())
+const selectedMonth = ref(new Date().getMonth() + 1)
+const selectedPolicy = ref('')
 
 const activeWorkspaceName = computed(() => {
   const ws = workspaceStore.workspaces.find(w => w.id === authStore.activeWorkspaceId)
   return ws?.name || '...'
 })
+
+const policyOptions = computed(() => {
+  const options = policiesStore.policies.map(p => ({ value: p.id, label: p.name }))
+  return [{ value: '', label: t.value.dashboard?.filterByPolicy || 'Todas as Políticas' }, ...options]
+})
+
+onMounted(() => {
+  if (authStore.activeWorkspaceId) loadData()
+})
+
+watch(() => authStore.activeWorkspaceId, loadData)
+
+watch([selectedYear, selectedPolicy], () => {
+  summaryStore.fetchCompanyYearlyAverage(selectedYear.value, selectedPolicy.value || undefined)
+})
+
+watch([selectedYear, selectedMonth], () => {
+  summaryStore.fetchCompanyAbsences(selectedYear.value, selectedMonth.value)
+})
+
+function loadData() {
+  employeesStore.fetchMembers(0)
+  policiesStore.fetchPolicies()
+  approvalsStore.fetchPending(0)
+  summaryStore.fetchAvailableYears()
+  summaryStore.fetchCompanyAbsences(selectedYear.value, selectedMonth.value)
+  summaryStore.fetchCompanyYearlyAverage(selectedYear.value)
+}
 
 function getInitials(name: string): string {
   if (!name) return '?'
@@ -37,13 +75,13 @@ function getInitials(name: string): string {
 }
 
 function getRoleTranslation(role: string): string {
-  const rolesMap = t.value.employees.roles as Record<string, string>
-  return rolesMap[role] || role
+  const rolesMap = t.value.employees?.roles as Record<string, string>
+  return rolesMap?.[role] || role
 }
 </script>
 
 <template>
-  <div>
+  <div class="animate-in fade-in duration-300">
     <div class="flex items-center justify-between bg-linear-to-r from-indigo-600 to-indigo-800 p-8 rounded-3xl shadow-lg text-white mb-8 relative overflow-hidden">
       <div class="max-w-2xl relative z-10">
         <h1 class="text-3xl font-bold tracking-tight mb-2">{{ t.dashboard.hello }}, {{ authStore.user?.fullName?.split(' ')[0] || t.dashboard.manager }}! 👋</h1>
@@ -55,7 +93,7 @@ function getRoleTranslation(role: string): string {
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
       <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between transition-all hover:shadow-md">
         <div class="flex items-start justify-between mb-4">
           <div class="p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl w-fit">
@@ -63,7 +101,7 @@ function getRoleTranslation(role: string): string {
           </div>
         </div>
         <div>
-          <h3 class="text-3xl font-bold text-gray-900 dark:text-white tabular-nums">{{ employeesStore.members.length }}</h3>
+          <h3 class="text-3xl font-bold text-gray-900 dark:text-white tabular-nums">{{ employeesStore.totalElements || employeesStore.members.length }}</h3>
           <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{{ t.dashboard.employees }}</p>
         </div>
       </div>
@@ -94,17 +132,43 @@ function getRoleTranslation(role: string): string {
         </div>
       </div>
 
-      <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between opacity-60">
+      <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between transition-all hover:shadow-md">
         <div class="flex items-start justify-between mb-4">
           <div class="p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-2xl w-fit">
             <Activity :size="24" />
           </div>
         </div>
         <div>
-          <h3 class="text-3xl font-bold text-gray-900 dark:text-white tabular-nums">--</h3>
+          <h3 class="text-3xl font-bold text-gray-900 dark:text-white tabular-nums">{{ approvalsStore.totalElements }}</h3>
           <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{{ t.dashboard.pending }}</p>
         </div>
       </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+      <div class="xl:col-span-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm overflow-hidden flex flex-col">
+        <YearlyEvolutionChart
+            :data="summaryStore.companyYearlyAverage"
+            :available-years="summaryStore.availableYears"
+            v-model="selectedYear"
+            :title="t.dashboard.yearlyEvolutionCompany || 'Média de Horas Anual da Empresa'"
+            class="border-none shadow-none rounded-none"
+        >
+          <template #actions>
+            <div class="w-48 hidden sm:block">
+              <BaseSelect v-model="selectedPolicy" :options="policyOptions" />
+            </div>
+          </template>
+        </YearlyEvolutionChart>
+      </div>
+
+      <AbsencePieChart
+          v-if="summaryStore.companyAbsences"
+          :title="t.dashboard.absencesTitle || 'Taxa de Absenteísmo'"
+          :total-expected-days="summaryStore.companyAbsences.totalExpectedDays"
+          :total-absences="summaryStore.companyAbsences.totalAbsences"
+          :percentage="summaryStore.companyAbsences.absencePercentage"
+      />
     </div>
 
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-8 shadow-sm">
