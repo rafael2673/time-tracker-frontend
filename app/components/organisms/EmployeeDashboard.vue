@@ -12,6 +12,7 @@ import YearlyEvolutionChart from '~/components/organisms/YearlyEvolutionChart.vu
 import WeeklyEvolutionChart from '~/components/organisms/WeeklyEvolutionChart.vue'
 import DailyRecordsTimeline from '~/components/organisms/DailyRecordsTimeline.vue'
 import TimeDistributionPieChart from '~/components/organisms/TimeDistributionPieChart.vue'
+import BaseSelect from '~/components/atoms/BaseSelect.vue'
 
 const props = defineProps<{
   currentRole?: string
@@ -24,20 +25,34 @@ const timeRecordsStore = useTimeRecordsStore()
 const summaryStore = useSummaryStore()
 const { t, locale } = useLocale()
 
-const selectedYear = ref<number>(new Date().getFullYear())
+const now = new Date()
+const selectedYear = ref<number>(now.getFullYear())
+const selectedMonth = ref<number>(now.getMonth() + 1)
+
+const monthOptions = computed(() => [
+  { value: 1, label: 'Janeiro' },
+  { value: 2, label: 'Fevereiro' },
+  { value: 3, label: 'Março' },
+  { value: 4, label: 'Abril' },
+  { value: 5, label: 'Maio' },
+  { value: 6, label: 'Junho' },
+  { value: 7, label: 'Julho' },
+  { value: 8, label: 'Agosto' },
+  { value: 9, label: 'Setembro' },
+  { value: 10, label: 'Outubro' },
+  { value: 11, label: 'Novembro' },
+  { value: 12, label: 'Dezembro' }
+])
+
 const hasHoliday = computed(() => Boolean(summaryStore.nextHoliday))
 const pendingJustifications = computed(() => summaryStore.employeeSummary?.pendingJustifications || 0)
 const hasPendingJustifications = computed(() => pendingJustifications.value > 0)
 const hasTimeDistribution = computed(() => Boolean(summaryStore.employeeTimeDistribution))
-const workedProgressPercentage = computed(() => {
-  const summary = summaryStore.employeeSummary
-  if (!summary?.expectedHours || summary.expectedHours <= 0) return 0
-  return Math.min(Math.round((summary.workedHours / summary.expectedHours) * 100), 100)
-})
 
 onMounted(async () => {
-  if (props.selectedEmployee?.id) {
-    await carregarDados(props.selectedEmployee.id)
+  const employeeId = props.selectedEmployee?.id
+  if (employeeId) {
+    await carregarDados(employeeId)
   }
 })
 
@@ -47,22 +62,25 @@ watch(() => props.selectedEmployee, async (newEmployee) => {
   }
 }, { immediate: true })
 
-watch(selectedYear, async (newYear) => {
-  if (newYear) {
-    await summaryStore.fetchYearlySummary(newYear)
+watch([selectedYear, selectedMonth], async () => {
+  const employeeId = props.selectedEmployee?.id
+  if (employeeId) {
+    await summaryStore.fetchEmployeeTimeDistribution(employeeId, selectedYear.value, selectedMonth.value)
+    if (selectedYear.value) {
+      await summaryStore.fetchYearlySummary(selectedYear.value)
+    }
   }
 })
 
 async function carregarDados(employeeId: string) {
-  const now = new Date()
-  const previousMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+  const referenceDate = new Date()
   await Promise.all([
     summaryStore.fetchAvailableYears(),
     summaryStore.fetchEmployeeSummary(employeeId),
     summaryStore.fetchYearlySummary(selectedYear.value),
-    summaryStore.fetchWeeklySummary(now.toISOString().split('T')[0] || ''),
+    summaryStore.fetchWeeklySummary(referenceDate.toISOString().split('T')[0] || ''),
     summaryStore.fetchNextHoliday(employeeId),
-    summaryStore.fetchEmployeeTimeDistribution(employeeId, previousMonthDate.getFullYear(), previousMonthDate.getMonth() + 1)
+    summaryStore.fetchEmployeeTimeDistribution(employeeId, selectedYear.value, selectedMonth.value)
   ])
 }
 
@@ -229,7 +247,15 @@ const nextHolidayDateMeta = computed(() => {
             :available-years="summaryStore.availableYears"
             v-model="selectedYear"
             :title="t.dashboard.yearlyEvolutionBaseline"
-        />
+        >
+          <template #actions>
+            <div class="flex items-center gap-2">
+              <div class="w-36">
+                <BaseSelect v-model="selectedMonth" :options="monthOptions" />
+              </div>
+            </div>
+          </template>
+        </YearlyEvolutionChart>
       </div>
 
       <!-- Right Column: Timeline (Col 10-12) -->

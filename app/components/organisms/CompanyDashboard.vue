@@ -29,10 +29,8 @@ const approvalsStore = useApprovalsStore()
 const { t } = useLocale()
 
 const now = new Date()
-const previousMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-
-const selectedYear = ref(previousMonthDate.getFullYear())
-const selectedMonth = ref(previousMonthDate.getMonth() + 1)
+const selectedYear = ref(now.getFullYear())
+const selectedMonth = ref(now.getMonth() + 1)
 const selectedPolicy = ref('')
 
 const activeWorkspaceName = computed(() => {
@@ -58,6 +56,7 @@ watch([selectedYear, selectedPolicy], () => {
 watch([selectedYear, selectedMonth], () => {
   summaryStore.fetchCompanyAbsences(selectedYear.value, selectedMonth.value)
   summaryStore.fetchTimeDistribution(selectedYear.value, selectedMonth.value)
+  summaryStore.fetchMonthlyBalance(selectedYear.value, selectedMonth.value)
 })
 
 function loadData() {
@@ -69,6 +68,7 @@ function loadData() {
   summaryStore.fetchTimeDistribution(selectedYear.value, selectedMonth.value)
   summaryStore.fetchCompanyYearlyAverage(selectedYear.value)
   summaryStore.fetchLaborRiskRanking()
+  summaryStore.fetchMonthlyBalance(selectedYear.value, selectedMonth.value)
 }
 
 function getInitials(name: string): string {
