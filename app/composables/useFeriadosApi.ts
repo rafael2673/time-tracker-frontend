@@ -1,3 +1,6 @@
+import { api } from '~/utils/api'
+import { useAuthStore } from '~/stores/auth'
+
 export interface Estado {
     uf: string
     nome: string
@@ -10,50 +13,26 @@ export interface Municipio {
 }
 
 export function useFeriadosApi() {
-    const config = useRuntimeConfig()
-    const token = config.public.feriadosApiToken
-    const baseUrl = 'https://feriadosapi.com/api/v1'
+    const authStore = useAuthStore()
 
     async function fetchEstados(): Promise<Estado[]> {
-        if (!token) return []
-        
+        if (!authStore.activeWorkspaceId) return []
         try {
-            const response = await fetch(`${baseUrl}/estados`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+            return await api<Estado[]>('/api/v1/locations/states', {
+                headers: { 'X-Workspace-Id': authStore.activeWorkspaceId }
             })
-            if (!response.ok) {
-                console.error('Failed to fetch states:', response.statusText)
-                return []
-            }
-            const data = await response.json()
-            return data.estados || []
         } catch (e) {
-            console.error('Error fetching states:', e)
             return []
         }
     }
 
     async function fetchMunicipios(uf: string): Promise<Municipio[]> {
-        if (!token || !uf) return []
-        
+        if (!authStore.activeWorkspaceId || !uf) return []
         try {
-            const response = await fetch(`${baseUrl}/municipios`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+            return await api<Municipio[]>(`/api/v1/locations/states/${uf}/municipalities`, {
+                headers: { 'X-Workspace-Id': authStore.activeWorkspaceId }
             })
-            if (!response.ok) {
-                console.error('Failed to fetch municipalities:', response.statusText)
-                return []
-            }
-            const data = await response.json()
-            
-            const allMunicipios: Municipio[] = data.municipios || []
-            return allMunicipios.filter(m => m.uf === uf)
         } catch (e) {
-            console.error('Error fetching municipalities:', e)
             return []
         }
     }

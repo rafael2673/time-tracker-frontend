@@ -29,12 +29,7 @@ export default defineNuxtConfig({
     }
   },
 
-  runtimeConfig: {
-    public: {
-      // Valor sobrescrito automaticamente pelo Nuxt caso exista NUXT_PUBLIC_FERIADOS_API_TOKEN no .env
-      feriadosApiToken: ''
-    }
-  },
+
 
   app: {
     head: {

@@ -9,6 +9,7 @@ export interface SpecialDateResponse {
     description: string
     workloadMultiplier: number
     isRecurring: boolean
+    type: 'NATIONAL' | 'STATE' | 'MUNICIPAL' | 'FACULTATIVE' | 'CUSTOM'
 }
 
 export interface SpecialDateRequest {
@@ -16,6 +17,7 @@ export interface SpecialDateRequest {
     description: string
     workloadMultiplier: number
     isRecurring: boolean
+    type?: 'NATIONAL' | 'STATE' | 'MUNICIPAL' | 'FACULTATIVE' | 'CUSTOM'
 }
 
 export const useSpecialDatesStore = defineStore('specialDates', () => {
@@ -90,16 +92,19 @@ export const useSpecialDatesStore = defineStore('specialDates', () => {
         }
     }
 
-    async function importNationalHolidays(year: number): Promise<boolean> {
+    async function forceSync(year: number): Promise<boolean> {
         if (!authStore.activeWorkspaceId) return false
+        isLoading.value = true
         try {
-            await api(`/api/v1/special-dates/import-national?year=${year}`, {
+            await api(`/api/v1/special-dates/sync?year=${year}`, {
                 method: 'POST',
                 headers: { 'X-Workspace-Id': authStore.activeWorkspaceId }
             })
             return true
         } catch (error) {
             return false
+        } finally {
+            isLoading.value = false
         }
     }
 
@@ -113,6 +118,6 @@ export const useSpecialDatesStore = defineStore('specialDates', () => {
         create,
         update,
         remove,
-        importNationalHolidays
+        forceSync
     }
 })

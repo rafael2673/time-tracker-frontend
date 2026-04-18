@@ -55,6 +55,7 @@ export interface PageResponse<T> {
 export interface CollectiveCompensatoryLeaveRequest {
     date: string
     reason: string
+    onlyEligible: boolean
 }
 
 export const useEmployeesStore = defineStore('employees', () => {
