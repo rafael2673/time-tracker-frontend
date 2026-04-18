@@ -28,8 +28,11 @@ const summaryStore = useSummaryStore()
 const approvalsStore = useApprovalsStore()
 const { t } = useLocale()
 
-const selectedYear = ref(new Date().getFullYear())
-const selectedMonth = ref(new Date().getMonth() + 1)
+const now = new Date()
+const previousMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+
+const selectedYear = ref(previousMonthDate.getFullYear())
+const selectedMonth = ref(previousMonthDate.getMonth() + 1)
 const selectedPolicy = ref('')
 
 const activeWorkspaceName = computed(() => {

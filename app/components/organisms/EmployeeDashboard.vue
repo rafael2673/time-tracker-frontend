@@ -55,13 +55,14 @@ watch(selectedYear, async (newYear) => {
 
 async function carregarDados(employeeId: string) {
   const now = new Date()
+  const previousMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
   await Promise.all([
     summaryStore.fetchAvailableYears(),
     summaryStore.fetchEmployeeSummary(employeeId),
     summaryStore.fetchYearlySummary(selectedYear.value),
     summaryStore.fetchWeeklySummary(now.toISOString().split('T')[0] || ''),
     summaryStore.fetchNextHoliday(employeeId),
-    summaryStore.fetchEmployeeTimeDistribution(employeeId, now.getFullYear(), now.getMonth() + 1)
+    summaryStore.fetchEmployeeTimeDistribution(employeeId, previousMonthDate.getFullYear(), previousMonthDate.getMonth() + 1)
   ])
 }
 

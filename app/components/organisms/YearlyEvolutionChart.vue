@@ -74,6 +74,29 @@ const expectedPath = computed(() => {
     return `${path} ${command} ${getX(i)},${getY(point.expectedHours)}`
   }, '')
 })
+
+const tooltipStyle = computed(() => {
+  if (hoveredIndex.value === null || !props.data[hoveredIndex.value]) {
+    return {}
+  }
+
+  const idx = hoveredIndex.value
+  const point = props.data[idx]
+  if (!point) {
+    return {}
+  }
+  const pointY = Math.min(getY(point.workedHours), getY(point.expectedHours))
+
+  const tooltipHeight = 44
+  const gap = 10
+  const topAbove = pointY - tooltipHeight - gap
+  const safeTop = topAbove < 8 ? Math.min(pointY + gap, height - tooltipHeight - 4) : topAbove
+
+  return {
+    left: `${getX(idx)}px`,
+    top: `${safeTop}px`
+  }
+})
 </script>
 
 <template>
@@ -98,8 +121,8 @@ const expectedPath = computed(() => {
     <div v-if="data && data.length > 0" class="relative w-full overflow-hidden" :style="{ height: `${height}px` }">
 
       <div v-if="hoveredIndex !== null && data[hoveredIndex]"
-           class="absolute z-50 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] font-bold px-2 py-1.5 rounded shadow-lg pointer-events-none transform -translate-x-1/2 -translate-y-full whitespace-nowrap flex flex-col items-center"
-           :style="{ left: `${getX(hoveredIndex)}px`, top: `${Math.min(getY(data[hoveredIndex]!.workedHours), getY(data[hoveredIndex]!.expectedHours)) - 15}px` }">
+           class="absolute z-50 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] font-bold px-2 py-1.5 rounded shadow-lg pointer-events-none transform -translate-x-1/2 whitespace-nowrap flex flex-col items-center"
+           :style="tooltipStyle">
         <span class="text-indigo-400 dark:text-indigo-600">Trab: {{ formatDecimalHours(data[hoveredIndex]!.workedHours) }}</span>
         <span class="text-gray-400 dark:text-gray-500">Esp: {{ formatDecimalHours(data[hoveredIndex]!.expectedHours) }}</span>
       </div>
@@ -140,28 +163,28 @@ const expectedPath = computed(() => {
         </g>
 
         <g class="interactions">
-          <rect v-for="(_, i) in data" :key="`interaction-${i}`"
-                :x="getX(i) - ((width - padding.left - padding.right) / (data.length - 1 || 1)) / 2"
+          <rect v-for="i in data.length" :key="`interaction-${i - 1}`"
+                :x="getX(i - 1) - ((width - padding.left - padding.right) / (data.length - 1 || 1)) / 2"
                 y="0"
                 :width="(width - padding.left - padding.right) / (data.length - 1 || 1)"
                 :height="height"
                 fill="transparent"
                 class="cursor-pointer outline-none"
-                @mouseenter="hoveredIndex = i"
+                @mouseenter="hoveredIndex = i - 1"
                 @mouseleave="hoveredIndex = null"
           />
         </g>
       </svg>
 
-      <div class="flex items-center justify-center gap-6 mt-4 pt-4 relative z-10 pointer-events-none">
-        <div class="flex items-center gap-2">
-          <div class="w-3 h-3 rounded-full bg-indigo-500"></div>
-          <span class="text-xs font-bold text-gray-600 dark:text-gray-300">{{ t.dashboard.workedHours }}</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="w-3 h-0.5 border-b-2 border-dashed border-gray-400"></div>
-          <span class="text-xs font-bold text-gray-600 dark:text-gray-300">{{ t.closures.expected }}</span>
-        </div>
+    </div>
+    <div v-if="data && data.length > 0" class="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full bg-indigo-500"></div>
+        <span class="text-xs font-bold text-gray-600 dark:text-gray-300">{{ t.dashboard.workedHours }}</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-0.5 border-b-2 border-dashed border-gray-400"></div>
+        <span class="text-xs font-bold text-gray-600 dark:text-gray-300">{{ t.closures.expected }}</span>
       </div>
     </div>
     <div v-else class="flex-1 flex items-center justify-center opacity-50" :style="{ height: `${height}px` }">
