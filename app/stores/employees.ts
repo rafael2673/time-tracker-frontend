@@ -52,6 +52,11 @@ export interface PageResponse<T> {
     number: number
 }
 
+export interface CollectiveCompensatoryLeaveRequest {
+    date: string
+    reason: string
+}
+
 export const useEmployeesStore = defineStore('employees', () => {
     const authStore = useAuthStore()
     const members = ref<WorkspaceMemberResponse[]>([])
@@ -139,6 +144,15 @@ export const useEmployeesStore = defineStore('employees', () => {
         })
         await fetchLeaves(employeeId)
     }
+    
+    async function createCollectiveCompensatoryLeave(request: CollectiveCompensatoryLeaveRequest) {
+        if (!authStore.activeWorkspaceId) return
+        await api(`/api/v1/workspaces/${authStore.activeWorkspaceId}/leaves/collective-compensatory`, {
+            method: 'POST',
+            body: request
+        })
+    }
+
     async function updateLeave(leaveId: string, request: EmployeeLeaveRequest) {
         if (!authStore.activeWorkspaceId) return
         const updatedLeave = await api<EmployeeLeaveResponse>(`/api/v1/workspaces/${authStore.activeWorkspaceId}/leaves/${leaveId}`, {
@@ -172,6 +186,7 @@ export const useEmployeesStore = defineStore('employees', () => {
         generateAccessCode,
         fetchLeaves,
         addLeave,
+        createCollectiveCompensatoryLeave,
         updateLeave,
         removeLeave
     }

@@ -12,6 +12,8 @@ import { formatDecimalHours } from '~/utils/timeFormatter'
 
 import YearlyEvolutionChart from '~/components/organisms/YearlyEvolutionChart.vue'
 import AbsencePieChart from '~/components/organisms/AbsencePieChart.vue'
+import TimeDistributionPieChart from '~/components/organisms/TimeDistributionPieChart.vue'
+import LaborRiskRanking from '~/components/organisms/LaborRiskRanking.vue'
 import BaseSelect from '~/components/atoms/BaseSelect.vue'
 
 const props = defineProps<{
@@ -52,6 +54,7 @@ watch([selectedYear, selectedPolicy], () => {
 
 watch([selectedYear, selectedMonth], () => {
   summaryStore.fetchCompanyAbsences(selectedYear.value, selectedMonth.value)
+  summaryStore.fetchTimeDistribution(selectedYear.value, selectedMonth.value)
 })
 
 function loadData() {
@@ -60,7 +63,9 @@ function loadData() {
   approvalsStore.fetchPending(0)
   summaryStore.fetchAvailableYears()
   summaryStore.fetchCompanyAbsences(selectedYear.value, selectedMonth.value)
+  summaryStore.fetchTimeDistribution(selectedYear.value, selectedMonth.value)
   summaryStore.fetchCompanyYearlyAverage(selectedYear.value)
+  summaryStore.fetchLaborRiskRanking()
 }
 
 function getInitials(name: string): string {
@@ -145,8 +150,8 @@ function getRoleTranslation(role: string): string {
       </div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
-      <div class="xl:col-span-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm overflow-hidden flex flex-col">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+      <div class="md:col-span-2 xl:col-span-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm overflow-hidden flex flex-col">
         <YearlyEvolutionChart
             :data="summaryStore.companyYearlyAverage"
             :available-years="summaryStore.availableYears"
@@ -169,6 +174,15 @@ function getRoleTranslation(role: string): string {
           :total-absences="summaryStore.companyAbsences.totalAbsences"
           :percentage="summaryStore.companyAbsences.absencePercentage"
       />
+
+      <TimeDistributionPieChart
+          v-if="summaryStore.timeDistribution"
+          :distribution="summaryStore.timeDistribution"
+      />
+    </div>
+
+    <div class="mb-8" v-if="summaryStore.laborRiskRanking">
+      <LaborRiskRanking :ranking="summaryStore.laborRiskRanking" />
     </div>
 
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-8 shadow-sm">

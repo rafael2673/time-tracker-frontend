@@ -13,6 +13,8 @@ export interface Workspace {
     closureCountType?: string
     closureShiftRule?: string
     closurePendingStrategy?: string
+    stateUf?: string
+    ibgeCode?: string
 }
 
 export const useWorkspaceStore = defineStore('workspaces', () => {
@@ -64,11 +66,35 @@ export const useWorkspaceStore = defineStore('workspaces', () => {
         }
     }
 
+    async function updateLocation(workspaceId: string, payload: { name: string, stateUf: string, ibgeCode: string }): Promise<boolean> {
+        isLoading.value = true
+        error.value = null
+        try {
+            const updatedWorkspace = await api<Workspace>(`/api/v1/workspaces/${workspaceId}`, {
+                method: 'PUT',
+                body: payload
+            })
+
+            const index = workspaces.value.findIndex(w => w.id === workspaceId)
+            if (index !== -1) {
+                workspaces.value[index] = { ...workspaces.value[index], ...updatedWorkspace }
+            }
+
+            return true
+        } catch (e: any) {
+            error.value = e.data?.message || 'Erro ao salvar localização do workspace'
+            return false
+        } finally {
+            isLoading.value = false
+        }
+    }
+
     return {
         workspaces,
         isLoading,
         error,
         fetchMyWorkspaces,
         updateAutoClosureSettings,
+        updateLocation,
     }
 })

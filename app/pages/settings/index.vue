@@ -5,6 +5,7 @@ import { useLocale } from '~/composables/useLocale'
 import SettingsProfileForm from '~/components/organisms/SettingsProfileForm.vue'
 import SettingsApiKey from '~/components/organisms/SettingsApiKey.vue'
 import SettingsAutoClosure from "~/components/organisms/SettingsAutoClosure.vue";
+import WorkspaceLocationForm from "~/components/organisms/WorkspaceLocationForm.vue";
 
 const authStore = useAuthStore()
 const { t } = useLocale()
@@ -61,6 +62,10 @@ async function handleSubmit() {
                 :on-submit="handleSubmit"
         />
 
+        <WorkspaceLocationForm 
+            v-if="authStore.isManager && authStore.activeWorkspaceId" 
+            :workspace-id="authStore.activeWorkspaceId" 
+        />
         <SettingsApiKey v-if="authStore.isManager"/>
         <SettingsAutoClosure v-if="authStore.isManager" />
     </div>
