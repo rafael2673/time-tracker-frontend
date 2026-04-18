@@ -276,7 +276,11 @@ export const translations = {
                 year: 'Evolução Anual'
             },
             current: {
-                week: 'Semana Atual'
+                week: 'Semana Atual',
+                workedVsExpected: 'Carga horária trabalhada vs esperada',
+                worked: 'Trabalhado',
+                expected: 'Esperado',
+                loading: 'Carregando atividade...'
             }
         },
         settings: {
@@ -613,7 +617,11 @@ export const translations = {
                 year: 'Annual Evolution'
             },
             current: {
-                week: 'Current Week'
+                week: 'Current Week',
+                workedVsExpected: 'Worked vs expected hours',
+                worked: 'Worked',
+                expected: 'Expected',
+                loading: 'Loading activity...'
             }
         },
         settings: {
