@@ -6,8 +6,12 @@ import { useLocale } from '~/composables/useLocale'
 
 export interface EmployeeDashboardSummary {
     workedHours: number
+    expectedHours: number
     balance: number
+    monthlyBalance: number
+    unjustifiedAbsences: number
     pendingJustifications: number
+    vacationDays: number
 }
 
 export interface MonthlyBalanceResponse {
@@ -77,6 +81,18 @@ export const useSummaryStore = defineStore('summary', () => {
     const companyYearlyAverage = ref<MonthSummaryResponse[]>([])
     const laborRiskRanking = ref<LaborRiskRankingResponse | null>(null)
     const timeDistribution = ref<TimeDistributionResponse | null>(null)
+    const employeeTimeDistribution = ref<TimeDistributionResponse | null>(null)
+
+    async function fetchEmployeeTimeDistribution(employeeId: string, year: number, month: number) {
+        if (!authStore.activeWorkspaceId) return
+        try {
+            employeeTimeDistribution.value = await api<TimeDistributionResponse>(`/api/v1/summary/employee/${employeeId}/time-distribution?year=${year}&month=${month}`, {
+                headers: { 'X-Workspace-Id': authStore.activeWorkspaceId }
+            })
+        } catch (error) {
+            employeeTimeDistribution.value = null
+        }
+    }
 
     async function fetchTimeDistribution(year: number, month: number) {
         if (!authStore.activeWorkspaceId) return
@@ -221,7 +237,9 @@ export const useSummaryStore = defineStore('summary', () => {
         availableYears,
         isLoadingSummary,
         nextHoliday,
+        employeeTimeDistribution,
         fetchEmployeeSummary,
+        fetchEmployeeTimeDistribution,
         fetchMonthlyBalance,
         fetchYearlySummary,
         fetchWeeklySummary,

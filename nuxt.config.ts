@@ -7,6 +7,16 @@ export default defineNuxtConfig({
     '@pinia/nuxt'
   ],
 
+  imports: {
+    presets: [
+      {
+        from: 'nitropack/runtime/internal/config',
+        imports: ['useAppConfig'],
+        priority: -1
+      }
+    ]
+  },
+
   vite: {
     plugins: [
       tailwindcss() as any,

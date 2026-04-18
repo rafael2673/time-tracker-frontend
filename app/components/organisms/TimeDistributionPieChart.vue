@@ -2,14 +2,17 @@
 import { computed } from 'vue'
 import type { TimeDistributionResponse } from '~/stores/summary'
 import { formatDecimalHours } from '~/utils/timeFormatter'
+import { useLocale } from '~/composables/useLocale'
 
 const props = defineProps<{
   distribution: TimeDistributionResponse
 }>()
 
+const { t } = useLocale()
+
 const total = computed(() => {
-  const t = props.distribution.regularHours + props.distribution.overtimeHours + props.distribution.absenceHours
-  return t > 0 ? t : 1 // Prevents division by zero
+  const tValue = props.distribution.regularHours + props.distribution.overtimeHours + props.distribution.absenceHours
+  return tValue > 0 ? tValue : 1 // Prevents division by zero
 })
 
 const radius = 60
@@ -39,7 +42,7 @@ const segments = computed(() => {
 
 <template>
   <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-sm w-full flex flex-col items-center justify-center relative">
-    <h3 class="text-sm font-bold text-gray-900 dark:text-white w-full text-left absolute top-6 left-6">Distribuição de Tempo</h3>
+    <h3 class="text-sm font-bold text-gray-900 dark:text-white w-full text-left absolute top-6 left-6">{{ t.dashboard.timeDistributionTitle }}</h3>
 
     <div class="relative w-40 h-40 mt-8 flex items-center justify-center">
       <svg class="w-full h-full -rotate-90 transform" viewBox="0 0 140 140">
@@ -69,7 +72,7 @@ const segments = computed(() => {
         <span class="text-2xl font-black text-gray-900 dark:text-white">
             {{ formatDecimalHours(distribution.totalExpectedHours) }}
         </span>
-        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-0.5">Total Mês</span>
+        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-0.5">{{ t.dashboard.totalMonth }}</span>
       </div>
     </div>
 
@@ -77,19 +80,19 @@ const segments = computed(() => {
       <div class="flex flex-col items-center text-center px-2">
         <div class="w-3 h-3 rounded-full bg-indigo-500 mb-1"></div>
         <span class="text-sm font-bold text-gray-900 dark:text-white">{{ formatDecimalHours(distribution.regularHours) }}</span>
-        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">Regular</span>
+        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">{{ t.dashboard.regular }}</span>
       </div>
       <div class="w-px h-8 bg-gray-100 dark:bg-gray-800"></div>
       <div class="flex flex-col items-center text-center px-2">
         <div class="w-3 h-3 rounded-full bg-amber-500 mb-1"></div>
         <span class="text-sm font-bold text-amber-600">{{ formatDecimalHours(distribution.overtimeHours) }}</span>
-        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">Extras</span>
+        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">{{ t.dashboard.extra }}</span>
       </div>
       <div class="w-px h-8 bg-gray-100 dark:bg-gray-800"></div>
       <div class="flex flex-col items-center text-center px-2">
         <div class="w-3 h-3 rounded-full bg-red-500 mb-1"></div>
         <span class="text-sm font-bold text-red-600">{{ formatDecimalHours(distribution.absenceHours) }}</span>
-        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">Ausências</span>
+        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">{{ t.dashboard.absences }}</span>
       </div>
     </div>
   </div>
