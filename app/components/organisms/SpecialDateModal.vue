@@ -70,7 +70,7 @@ watch(() => props.isOpen, (newVal) => {
 
 function handleSubmit() {
   const payload = isCompensatoryCollective.value
-    ? { ...formData.value, type: 'FACULTATIVE', onlyEligible: onlyEligible.value, isCompensatoryCollective: true }
+    ? { ...formData.value, type: TYPE_COMPENSATORY, onlyEligible: onlyEligible.value, isCompensatoryCollective: true }
     : formData.value
   emit('save', payload, props.editingDate?.id || null)
 }

@@ -60,7 +60,7 @@ async function carregarDados(employeeId: string) {
     summaryStore.fetchEmployeeSummary(employeeId),
     summaryStore.fetchYearlySummary(selectedYear.value),
     summaryStore.fetchWeeklySummary(now.toISOString().split('T')[0] || ''),
-    summaryStore.fetchNextHoliday(),
+    summaryStore.fetchNextHoliday(employeeId),
     summaryStore.fetchEmployeeTimeDistribution(employeeId, now.getFullYear(), now.getMonth() + 1)
   ])
 }

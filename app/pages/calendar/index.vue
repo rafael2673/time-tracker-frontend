@@ -8,7 +8,6 @@ import BaseSelect from '~/components/atoms/BaseSelect.vue'
 import FilterBar from '~/components/molecules/FilterBar.vue'
 import PaginationControls from '~/components/molecules/PaginationControls.vue'
 import SpecialDateModal from '~/components/organisms/SpecialDateModal.vue'
-import CollectiveLeaveModal from '~/components/organisms/CollectiveLeaveModal.vue'
 import ConfirmModal from '~/components/molecules/ConfirmModal.vue'
 
 const specialDatesStore = useSpecialDatesStore()
@@ -30,7 +29,6 @@ const itemToDelete = ref<string | null>(null)
 
 const isCollectiveModalOpen = ref(false)
 const collectiveModalDate = ref('')
-const isCollectiveSubmitting = ref(false)
 
 const yearOptions = computed(() => {
   const current = new Date().getFullYear()
@@ -136,27 +134,15 @@ function openCollectiveModal(date: string) {
   isCollectiveModalOpen.value = true
 }
 
-async function handleCollectiveLeave(payload: { date: string; reason: string; onlyEligible: boolean }) {
-  if (isCollectiveSubmitting.value) return
-  isCollectiveSubmitting.value = true
-  try {
-    await employeesStore.createCollectiveCompensatoryLeave(payload)
-    showMessage('Folga coletiva aplicada com sucesso!', 'success')
-    isCollectiveModalOpen.value = false
-  } catch {
-    showMessage('Erro ao aplicar folga coletiva.', 'error')
-  } finally {
-    isCollectiveSubmitting.value = false
-  }
-}
-
 function getTypeLabel(type: string) {
+  const calendarLocal = t.value.calendar as any
   switch (type) {
-    case 'NATIONAL': return t.value.calendar.typeNational || 'Nacional'
-    case 'STATE': return t.value.calendar.typeState || 'Estadual'
-    case 'MUNICIPAL': return t.value.calendar.typeMunicipal || 'Municipal'
-    case 'FACULTATIVE': return t.value.calendar.typeFacultative || 'Facultativo'
-    case 'CUSTOM': return t.value.calendar.typeCustom || 'Customizado'
+    case 'NATIONAL': return calendarLocal.typeNational || 'Nacional'
+    case 'STATE': return calendarLocal.typeState || 'Estadual'
+    case 'MUNICIPAL': return calendarLocal.typeMunicipal || 'Municipal'
+    case 'FACULTATIVE': return calendarLocal.typeFacultative || 'Facultativo'
+    case 'COMPENSATORY_COLLECTIVE': return calendarLocal.typeCompensatoryCollective || 'Folga Compensatoria Coletiva'
+    case 'CUSTOM': return calendarLocal.typeCustom || 'Customizado'
     default: return type
   }
 }
@@ -167,6 +153,7 @@ function getTypeClass(type: string) {
     case 'STATE': return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
     case 'MUNICIPAL': return 'bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-900/30 dark:text-fuchsia-400'
     case 'FACULTATIVE': return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+    case 'COMPENSATORY_COLLECTIVE': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
     case 'CUSTOM': return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
     default: return 'bg-gray-100 text-gray-700'
   }
@@ -185,11 +172,11 @@ function getTypeClass(type: string) {
           <BaseSelect v-model="selectedYear" :options="yearOptions" />
         </div>
 
-        <button @click="executeForceSync()" :disabled="specialDatesStore.isLoading" class="p-2 text-gray-500 hover:text-indigo-600 bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-xl shadow-sm transition-colors flex items-center justify-center h-[42px] w-[42px] disabled:opacity-50" title="Forçar Sincronização">
+        <button @click="executeForceSync()" :disabled="specialDatesStore.isLoading" class="p-2 text-gray-500 hover:text-indigo-600 bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-xl shadow-sm transition-colors flex items-center justify-center h-10.5 w-10.5 disabled:opacity-50" title="Forçar Sincronização">
           <RefreshCw :size="16" :class="{ 'animate-spin': specialDatesStore.isLoading }" />
         </button>
 
-        <button @click="openModal()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition-colors flex items-center gap-2 cursor-pointer h-[42px]">
+        <button @click="openModal()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition-colors flex items-center gap-2 cursor-pointer h-10.5">
           <Plus :size="16" />
           <span class="hidden sm:inline">{{ t.calendar.newDate }}</span>
         </button>
@@ -285,14 +272,6 @@ function getTypeClass(type: string) {
         :is-loading="isDeleting"
         @confirm="executeDelete"
         @cancel="isConfirmModalOpen = false"
-    />
-
-    <CollectiveLeaveModal
-        :is-open="isCollectiveModalOpen"
-        :date="collectiveModalDate"
-        :is-submitting="isCollectiveSubmitting"
-        @close="isCollectiveModalOpen = false"
-        @confirm="handleCollectiveLeave"
     />
   </div>
 </template>

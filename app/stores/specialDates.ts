@@ -9,7 +9,7 @@ export interface SpecialDateResponse {
     description: string
     workloadMultiplier: number
     isRecurring: boolean
-    type: 'NATIONAL' | 'STATE' | 'MUNICIPAL' | 'FACULTATIVE' | 'CUSTOM'
+    type: 'NATIONAL' | 'STATE' | 'MUNICIPAL' | 'FACULTATIVE' | 'CUSTOM' | 'COMPENSATORY_COLLECTIVE'
 }
 
 export interface SpecialDateRequest {
@@ -17,7 +17,7 @@ export interface SpecialDateRequest {
     description: string
     workloadMultiplier: number
     isRecurring: boolean
-    type?: 'NATIONAL' | 'STATE' | 'MUNICIPAL' | 'FACULTATIVE' | 'CUSTOM'
+    type?: 'NATIONAL' | 'STATE' | 'MUNICIPAL' | 'FACULTATIVE' | 'CUSTOM' | 'COMPENSATORY_COLLECTIVE'
 }
 
 export const useSpecialDatesStore = defineStore('specialDates', () => {

@@ -116,10 +116,13 @@ export const useSummaryStore = defineStore('summary', () => {
         }
     }
 
-    async function fetchNextHoliday() {
+    async function fetchNextHoliday(employeeId?: string) {
         if (!authStore.activeWorkspaceId) return
         try {
-            nextHoliday.value = await api<NextHolidayResponse>('/api/v1/summary/next-holiday', {
+            const url = employeeId
+                ? `/api/v1/summary/next-holiday?employeeId=${employeeId}`
+                : '/api/v1/summary/next-holiday'
+            nextHoliday.value = await api<NextHolidayResponse>(url, {
                 headers: { 'X-Workspace-Id': authStore.activeWorkspaceId }
             })
         } catch (error) {

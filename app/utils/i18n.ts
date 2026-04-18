@@ -175,6 +175,7 @@ export const translations = {
             next: 'Próxima',
             deleteDateTitle: 'Excluir Data Especial',
             confirmDeleteDate: 'Tem certeza que deseja excluir esta data?',
+            typeCompensatoryCollective: 'Folga Compensatoria Coletiva'
         },
         modal: {
             confirm: 'Confirmar',
@@ -511,6 +512,7 @@ export const translations = {
             next: 'Next',
             deleteDateTitle: 'Delete Special Date',
             confirmDeleteDate: 'Are you sure you want to delete this date?',
+            typeCompensatoryCollective: 'Collective Compensatory Leave'
         },
         modal: {
             confirm: 'Confirm',
