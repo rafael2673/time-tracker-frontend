@@ -7,14 +7,16 @@ import BaseSelect from '~/components/atoms/BaseSelect.vue'
 import { formatDecimalHours } from '~/utils/timeFormatter'
 
 const props = defineProps<{
-  data: MonthSummaryResponse[]
+  data: (MonthSummaryResponse | any)[]
   availableYears: number[]
   modelValue: number
+  selectedMonth?: number
   title?: string
 }>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: number): void
+  (e: 'selectMonth', month: number): void
 }>()
 
 const { t } = useLocale()
@@ -37,7 +39,7 @@ onMounted(() => {
 
 const maxHours = computed(() => {
   if (!props.data || props.data.length === 0) return 1
-  const max = Math.max(...props.data.map(d => Math.max(d.workedHours, d.expectedHours)))
+  const max = Math.max(...props.data.map(d => Math.max(d.workedHours || d.hours || 0, d.expectedHours || 0)))
   return max > 0 ? Math.ceil(max / 50) * 50 : 200
 })
 
@@ -63,7 +65,7 @@ const workedPath = computed(() => {
   if (props.data.length === 0) return ''
   return props.data.reduce((path, point, i) => {
     const command = i === 0 ? 'M' : 'L'
-    return `${path} ${command} ${getX(i)},${getY(point.workedHours)}`
+    return `${path} ${command} ${getX(i)},${getY(point.workedHours || point.hours || 0)}`
   }, '')
 })
 
@@ -71,7 +73,7 @@ const expectedPath = computed(() => {
   if (props.data.length === 0) return ''
   return props.data.reduce((path, point, i) => {
     const command = i === 0 ? 'M' : 'L'
-    return `${path} ${command} ${getX(i)},${getY(point.expectedHours)}`
+    return `${path} ${command} ${getX(i)},${getY(point.expectedHours || 0)}`
   }, '')
 })
 
@@ -85,7 +87,7 @@ const tooltipStyle = computed(() => {
   if (!point) {
     return {}
   }
-  const pointY = Math.min(getY(point.workedHours), getY(point.expectedHours))
+  const pointY = Math.min(getY(point.workedHours || point.hours || 0), getY(point.expectedHours || 0))
 
   const tooltipHeight = 44
   const gap = 10
@@ -97,6 +99,10 @@ const tooltipStyle = computed(() => {
     top: `${safeTop}px`
   }
 })
+
+function isSelected(index: number) {
+  return props.selectedMonth === (index + 1)
+}
 </script>
 
 <template>
@@ -123,8 +129,8 @@ const tooltipStyle = computed(() => {
       <div v-if="hoveredIndex !== null && data[hoveredIndex]"
            class="absolute z-50 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] font-bold px-2 py-1.5 rounded shadow-lg pointer-events-none transform -translate-x-1/2 whitespace-nowrap flex flex-col items-center"
            :style="tooltipStyle">
-        <span class="text-indigo-400 dark:text-indigo-600">Trab: {{ formatDecimalHours(data[hoveredIndex]!.workedHours) }}</span>
-        <span class="text-gray-400 dark:text-gray-500">Esp: {{ formatDecimalHours(data[hoveredIndex]!.expectedHours) }}</span>
+        <span class="text-indigo-400 dark:text-indigo-600">Trab: {{ formatDecimalHours(data[hoveredIndex]?.workedHours || data[hoveredIndex]?.hours || 0) }}</span>
+        <span class="text-gray-400 dark:text-gray-500">Esp: {{ formatDecimalHours(data[hoveredIndex]?.expectedHours || 0) }}</span>
       </div>
 
       <svg :width="width" :height="height" class="absolute top-0 left-0 overflow-visible">
@@ -133,6 +139,18 @@ const tooltipStyle = computed(() => {
                 :x1="padding.left" :y1="getY((i-1) * (maxHours / 4))"
                 :x2="width - padding.right" :y2="getY((i-1) * (maxHours / 4))"
                 stroke="currentColor" class="text-gray-100 dark:text-gray-800" stroke-width="1" />
+        </g>
+
+        <g class="x-axis-highlights">
+          <rect v-for="i in data.length" :key="`highlight-${i - 1}`"
+                :x="getX(i - 1) - 15"
+                :y="padding.top - 10"
+                width="30"
+                :height="height - padding.top - padding.bottom + 20"
+                rx="8"
+                class="transition-colors duration-300 pointer-events-none"
+                :class="isSelected(i - 1) ? 'fill-indigo-500/10' : (hoveredIndex === i - 1 ? 'fill-gray-500/5' : 'fill-transparent')"
+          />
         </g>
 
         <g class="y-axis-labels text-[10px] fill-gray-400 font-medium">
@@ -146,8 +164,10 @@ const tooltipStyle = computed(() => {
         <g class="x-axis-labels text-[10px] fill-gray-400 font-bold uppercase">
           <text v-for="(point, i) in data" :key="`label-x-${i}`"
                 :x="getX(i)" :y="height - 5"
-                text-anchor="middle">
-            {{ point.monthName.substring(0, 3) }}
+                text-anchor="middle"
+                class="transition-colors duration-300"
+                :class="isSelected(i) ? 'fill-indigo-600' : ''">
+            {{ point.monthName ? point.monthName.substring(0, 3) : point.day }}
           </text>
         </g>
 
@@ -157,9 +177,9 @@ const tooltipStyle = computed(() => {
 
         <g class="points">
           <circle v-for="(point, i) in data" :key="`point-${i}`"
-                  :cx="getX(i)" :cy="getY(point.workedHours)" r="4"
+                  :cx="getX(i)" :cy="getY(point.workedHours || point.hours || 0)" r="4"
                   class="fill-white dark:fill-gray-900 stroke-indigo-500 transition-all"
-                  :class="hoveredIndex === i ? 'stroke-[4px]' : 'stroke-2'" />
+                  :class="[hoveredIndex === i ? 'stroke-[4px]' : 'stroke-2', isSelected(i) ? 'r-6' : '']" />
         </g>
 
         <g class="interactions">
@@ -172,6 +192,7 @@ const tooltipStyle = computed(() => {
                 class="cursor-pointer outline-none"
                 @mouseenter="hoveredIndex = i - 1"
                 @mouseleave="hoveredIndex = null"
+                @click="emit('selectMonth', i - 1)"
           />
         </g>
       </svg>

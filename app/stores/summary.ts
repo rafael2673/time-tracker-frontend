@@ -82,6 +82,7 @@ export const useSummaryStore = defineStore('summary', () => {
     const laborRiskRanking = ref<LaborRiskRankingResponse | null>(null)
     const timeDistribution = ref<TimeDistributionResponse | null>(null)
     const employeeTimeDistribution = ref<TimeDistributionResponse | null>(null)
+    const companyDailyAverage = ref<DailySummaryResponse[]>([])
 
     async function fetchEmployeeTimeDistribution(employeeId: string, year: number, month: number) {
         if (!authStore.activeWorkspaceId) return
@@ -105,14 +106,32 @@ export const useSummaryStore = defineStore('summary', () => {
         }
     }
 
-    async function fetchLaborRiskRanking() {
+    async function fetchLaborRiskRanking(year?: number, month?: number) {
         if (!authStore.activeWorkspaceId) return
         try {
-            laborRiskRanking.value = await api<LaborRiskRankingResponse>('/api/v1/summary/company/labor-risk', {
+            let url = '/api/v1/summary/labor-risk-ranking'
+            if (year && month) {
+                url += `?year=${year}&month=${month}`
+            }
+            laborRiskRanking.value = await api<LaborRiskRankingResponse>(url, {
                 headers: { 'X-Workspace-Id': authStore.activeWorkspaceId }
             })
         } catch (error) {
             laborRiskRanking.value = null
+        }
+    }
+
+    async function fetchCompanyDailyAverage(year: number, month: number) {
+        if (!authStore.activeWorkspaceId) return
+        try {
+            companyDailyAverage.value = await api<DailySummaryResponse[]>(`/api/v1/summary/company-daily-average?year=${year}&month=${month}`, {
+                headers: {
+                    'X-Workspace-Id': authStore.activeWorkspaceId,
+                    'Accept-Language': locale.value
+                }
+            })
+        } catch (error) {
+            companyDailyAverage.value = []
         }
     }
 
@@ -241,6 +260,7 @@ export const useSummaryStore = defineStore('summary', () => {
         isLoadingSummary,
         nextHoliday,
         employeeTimeDistribution,
+        companyDailyAverage,
         fetchEmployeeSummary,
         fetchEmployeeTimeDistribution,
         fetchMonthlyBalance,
@@ -251,6 +271,7 @@ export const useSummaryStore = defineStore('summary', () => {
         fetchCompanyAbsences,
         fetchCompanyYearlyAverage,
         fetchLaborRiskRanking,
-        fetchTimeDistribution
+        fetchTimeDistribution,
+        fetchCompanyDailyAverage
     }
 })

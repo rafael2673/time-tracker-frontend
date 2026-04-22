@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import { Users, Briefcase, Clock, Activity, Building2 } from 'lucide-vue-next'
+import { ref, onMounted, watch, computed } from 'vue'
+import { Users, Briefcase, Clock, Activity, Building2, ChevronLeft } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth'
 import { useWorkspaceStore } from '~/stores/workspaces'
 import { useEmployeesStore } from '~/stores/employees'
@@ -32,31 +32,71 @@ const now = new Date()
 const selectedYear = ref(now.getFullYear())
 const selectedMonth = ref(now.getMonth() + 1)
 const selectedPolicy = ref('')
+const isDrillDown = ref(false)
+
+const STORAGE_KEY = 'companyDashboard_drillDown'
 
 const activeWorkspaceName = computed(() => {
-  const ws = workspaceStore.workspaces.find(w => w.id === authStore.activeWorkspaceId)
-  return ws?.name || '...'
+  const activeWs = workspaceStore.workspaces.find(ws => ws.id === authStore.activeWorkspaceId)
+  return activeWs?.name || ''
 })
 
 const policyOptions = computed(() => {
   const options = policiesStore.policies.map(p => ({ value: p.id, label: p.name }))
-  return [{ value: '', label: t.value.dashboard?.filterByPolicy || 'Todas as Políticas' }, ...options]
+  return [{ value: '', label: (t.value.dashboard as any).filterByPolicy || 'Todas as Políticas' }, ...options]
 })
 
 onMounted(() => {
+  if (import.meta.client) {
+    const cached = localStorage.getItem(STORAGE_KEY)
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached)
+        if (parsed.isDrillDown !== undefined) isDrillDown.value = parsed.isDrillDown
+        if (parsed.selectedMonth) selectedMonth.value = parsed.selectedMonth
+      } catch (e) {}
+    }
+  }
   if (authStore.activeWorkspaceId) loadData()
 })
 
 watch(() => authStore.activeWorkspaceId, loadData)
 
-watch([selectedYear, selectedPolicy], () => {
-  summaryStore.fetchCompanyYearlyAverage(selectedYear.value, selectedPolicy.value || undefined)
+watch([isDrillDown, selectedMonth], () => {
+  if (import.meta.client) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      isDrillDown: isDrillDown.value,
+      selectedMonth: selectedMonth.value
+    }))
+  }
 })
 
-watch([selectedYear, selectedMonth], () => {
-  summaryStore.fetchCompanyAbsences(selectedYear.value, selectedMonth.value)
-  summaryStore.fetchTimeDistribution(selectedYear.value, selectedMonth.value)
-  summaryStore.fetchMonthlyBalance(selectedYear.value, selectedMonth.value)
+watch([selectedYear, selectedPolicy], () => {
+  summaryStore.fetchCompanyYearlyAverage(selectedYear.value, selectedPolicy.value || undefined)
+  if (isDrillDown.value) {
+    summaryStore.fetchCompanyDailyAverage(selectedYear.value, selectedMonth.value)
+  }
+})
+
+watch([selectedYear, selectedMonth, isDrillDown], () => {
+  const monthParam = isDrillDown.value ? selectedMonth.value : undefined
+  if (monthParam) {
+    summaryStore.fetchCompanyAbsences(selectedYear.value, monthParam)
+    summaryStore.fetchTimeDistribution(selectedYear.value, monthParam)
+    summaryStore.fetchMonthlyBalance(selectedYear.value, monthParam)
+    summaryStore.fetchLaborRiskRanking(selectedYear.value, monthParam)
+  } else {
+    // Current implementations expect year/month to be provided for these specific requests
+    const currentMonth = new Date().getMonth() + 1
+    summaryStore.fetchCompanyAbsences(selectedYear.value, currentMonth)
+    summaryStore.fetchTimeDistribution(selectedYear.value, currentMonth)
+    summaryStore.fetchMonthlyBalance(selectedYear.value, currentMonth)
+    summaryStore.fetchLaborRiskRanking(selectedYear.value, currentMonth)
+  }
+
+  if (isDrillDown.value) {
+    summaryStore.fetchCompanyDailyAverage(selectedYear.value, selectedMonth.value)
+  }
 })
 
 function loadData() {
@@ -64,11 +104,27 @@ function loadData() {
   policiesStore.fetchPolicies()
   approvalsStore.fetchPending(0)
   summaryStore.fetchAvailableYears()
-  summaryStore.fetchCompanyAbsences(selectedYear.value, selectedMonth.value)
-  summaryStore.fetchTimeDistribution(selectedYear.value, selectedMonth.value)
+  
+  const monthParam = isDrillDown.value ? selectedMonth.value : new Date().getMonth() + 1
+
+  summaryStore.fetchCompanyAbsences(selectedYear.value, monthParam)
+  summaryStore.fetchTimeDistribution(selectedYear.value, monthParam)
+  summaryStore.fetchLaborRiskRanking(selectedYear.value, monthParam)
+  summaryStore.fetchMonthlyBalance(selectedYear.value, monthParam)
+  
   summaryStore.fetchCompanyYearlyAverage(selectedYear.value)
-  summaryStore.fetchLaborRiskRanking()
-  summaryStore.fetchMonthlyBalance(selectedYear.value, selectedMonth.value)
+  if (isDrillDown.value) {
+    summaryStore.fetchCompanyDailyAverage(selectedYear.value, selectedMonth.value)
+  }
+}
+
+function handleSelectMonth(monthIdx: number) {
+  selectedMonth.value = monthIdx + 1
+  isDrillDown.value = true
+}
+
+function resetDrillDown() {
+  isDrillDown.value = false
 }
 
 function getInitials(name: string): string {
@@ -156,15 +212,27 @@ function getRoleTranslation(role: string): string {
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
       <div class="md:col-span-2 xl:col-span-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm overflow-hidden flex flex-col">
         <YearlyEvolutionChart
-            :data="summaryStore.companyYearlyAverage"
+            :data="(isDrillDown ? summaryStore.companyDailyAverage : summaryStore.companyYearlyAverage) as any"
             :available-years="summaryStore.availableYears"
             v-model="selectedYear"
-            :title="t.dashboard.yearlyEvolutionCompany || 'Média de Horas Anual da Empresa'"
+            :selected-month="selectedMonth"
+            :title="(isDrillDown ? (t.dashboard as any).monthlyEvolutionCompany : (t.dashboard as any).yearlyEvolutionCompany) || 'Evolução'"
+            @select-month="handleSelectMonth"
             class="border-none shadow-none rounded-none"
         >
           <template #actions>
-            <div class="w-48 hidden sm:block">
-              <BaseSelect v-model="selectedPolicy" :options="policyOptions" />
+            <div class="flex items-center gap-2">
+              <button
+                v-if="isDrillDown"
+                @click="resetDrillDown"
+                class="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-bold rounded-xl hover:bg-gray-200 transition-colors flex items-center gap-2"
+              >
+                <ChevronLeft :size="14" />
+                {{ t.dashboard.backToCompany }}
+              </button>
+              <div class="w-48 hidden sm:block">
+                <BaseSelect v-model="selectedPolicy" :options="policyOptions" />
+              </div>
             </div>
           </template>
         </YearlyEvolutionChart>
@@ -172,7 +240,7 @@ function getRoleTranslation(role: string): string {
 
       <AbsencePieChart
           v-if="summaryStore.companyAbsences"
-          :title="t.dashboard.absencesTitle || 'Taxa de Absenteísmo'"
+          :title="t.dashboard.absencesTitle"
           :total-expected-days="summaryStore.companyAbsences.totalExpectedDays"
           :total-absences="summaryStore.companyAbsences.totalAbsences"
           :percentage="summaryStore.companyAbsences.absencePercentage"

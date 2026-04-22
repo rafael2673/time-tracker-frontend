@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { AlertCircle, CalendarDays } from 'lucide-vue-next'
+import { AlertCircle, CalendarDays, ChevronLeft } from 'lucide-vue-next'
 import { useTimeRecordsStore } from '~/stores/timeRecords'
 import { useSummaryStore } from '~/stores/summary'
+import { useAuthStore } from '~/stores/auth'
 import { useLocale } from '~/composables/useLocale'
 import { formatDecimalHours } from '~/utils/timeFormatter'
 
@@ -23,49 +24,109 @@ const props = defineProps<{
 
 const timeRecordsStore = useTimeRecordsStore()
 const summaryStore = useSummaryStore()
+const authStore = useAuthStore()
 const { t, locale } = useLocale()
 
 const now = new Date()
 const selectedYear = ref<number>(now.getFullYear())
 const selectedMonth = ref<number>(now.getMonth() + 1)
+const isDrillDown = ref(false)
 
-const monthOptions = computed(() => [
-  { value: 1, label: 'Janeiro' },
-  { value: 2, label: 'Fevereiro' },
-  { value: 3, label: 'Março' },
-  { value: 4, label: 'Abril' },
-  { value: 5, label: 'Maio' },
-  { value: 6, label: 'Junho' },
-  { value: 7, label: 'Julho' },
-  { value: 8, label: 'Agosto' },
-  { value: 9, label: 'Setembro' },
-  { value: 10, label: 'Outubro' },
-  { value: 11, label: 'Novembro' },
-  { value: 12, label: 'Dezembro' }
-])
+const drillDownChartData = computed(() => {
+  return summaryStore.weeklySummary.map(d => ({
+    month: 0,
+    monthName: d.day,
+    workedHours: d.hours,
+    expectedHours: d.expectedHours
+  }))
+})
+
+const chartData = computed(() => {
+  return isDrillDown.value ? drillDownChartData.value : summaryStore.yearlySummary
+})
+
+const monthOptions = computed(() => {
+  const m = t.value.months as Record<string, string>
+  return [
+    { value: 1, label: m['1'] || '1' },
+    { value: 2, label: m['2'] || '2' },
+    { value: 3, label: m['3'] || '3' },
+    { value: 4, label: m['4'] || '4' },
+    { value: 5, label: m['5'] || '5' },
+    { value: 6, label: m['6'] || '6' },
+    { value: 7, label: m['7'] || '7' },
+    { value: 8, label: m['8'] || '8' },
+    { value: 9, label: m['9'] || '9' },
+    { value: 10, label: m['10'] || '10' },
+    { value: 11, label: m['11'] || '11' },
+    { value: 12, label: m['12'] || '12' }
+  ]
+})
+
+const chartTitle = computed(() => {
+  if (isDrillDown.value) {
+    const monthLabel = monthOptions.value.find(m => m.value === Number(selectedMonth.value))?.label || ''
+    return `${t.value.dashboard?.yearlyEvolutionBaseline} - ${monthLabel}`
+  }
+  return t.value.dashboard?.yearlyEvolutionBaseline
+})
 
 const hasHoliday = computed(() => Boolean(summaryStore.nextHoliday))
 const pendingJustifications = computed(() => summaryStore.employeeSummary?.pendingJustifications || 0)
 const hasPendingJustifications = computed(() => pendingJustifications.value > 0)
 const hasTimeDistribution = computed(() => Boolean(summaryStore.employeeTimeDistribution))
+const workedProgressPercentage = computed(() => {
+  const summary = summaryStore.employeeSummary
+  if (!summary?.expectedHours || summary.expectedHours <= 0) return 0
+  return Math.min(Math.round((summary.workedHours / summary.expectedHours) * 100), 100)
+})
+
+const STORAGE_KEY = 'employeeDashboard_drillDown'
 
 onMounted(async () => {
-  const employeeId = props.selectedEmployee?.id
+  if (import.meta.client) {
+    const cached = localStorage.getItem(STORAGE_KEY)
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached)
+        if (parsed.isDrillDown !== undefined) isDrillDown.value = parsed.isDrillDown
+        if (parsed.selectedMonth) selectedMonth.value = parsed.selectedMonth
+      } catch (e) {}
+    }
+  }
+  const employeeId = props.selectedEmployee?.id || authStore.user?.id
   if (employeeId) {
     await carregarDados(employeeId)
   }
 })
 
+watch([isDrillDown, selectedMonth], () => {
+  if (import.meta.client) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      isDrillDown: isDrillDown.value,
+      selectedMonth: selectedMonth.value
+    }))
+  }
+})
+
 watch(() => props.selectedEmployee, async (newEmployee) => {
-  if (newEmployee?.id) {
-    await carregarDados(newEmployee.id)
+  const employeeId = newEmployee?.id || authStore.user?.id
+  if (employeeId) {
+    await carregarDados(employeeId)
   }
 }, { immediate: true })
 
-watch([selectedYear, selectedMonth], async () => {
-  const employeeId = props.selectedEmployee?.id
+watch([selectedYear, selectedMonth, isDrillDown], async () => {
+  const employeeId = props.selectedEmployee?.id || authStore.user?.id
   if (employeeId) {
-    await summaryStore.fetchEmployeeTimeDistribution(employeeId, selectedYear.value, selectedMonth.value)
+    const monthParam = isDrillDown.value ? selectedMonth.value : undefined
+    if (monthParam) {
+      await summaryStore.fetchEmployeeTimeDistribution(employeeId, selectedYear.value, monthParam)
+    } else {
+      const currentMonth = new Date().getMonth() + 1
+      await summaryStore.fetchEmployeeTimeDistribution(employeeId, selectedYear.value, currentMonth)
+    }
+
     if (selectedYear.value) {
       await summaryStore.fetchYearlySummary(selectedYear.value)
     }
@@ -74,14 +135,27 @@ watch([selectedYear, selectedMonth], async () => {
 
 async function carregarDados(employeeId: string) {
   const referenceDate = new Date()
+  const monthParam = isDrillDown.value ? selectedMonth.value : new Date().getMonth() + 1
+
   await Promise.all([
     summaryStore.fetchAvailableYears(),
     summaryStore.fetchEmployeeSummary(employeeId),
     summaryStore.fetchYearlySummary(selectedYear.value),
     summaryStore.fetchWeeklySummary(referenceDate.toISOString().split('T')[0] || ''),
     summaryStore.fetchNextHoliday(employeeId),
-    summaryStore.fetchEmployeeTimeDistribution(employeeId, selectedYear.value, selectedMonth.value)
+    summaryStore.fetchEmployeeTimeDistribution(employeeId, selectedYear.value, monthParam)
   ])
+}
+
+function handleSelectMonth(monthIdx: number) {
+  selectedMonth.value = monthIdx + 1
+  isDrillDown.value = true
+}
+
+function resetDrillDown() {
+  isDrillDown.value = false
+  const today = new Date()
+  selectedMonth.value = today.getMonth() + 1
 }
 
 function formatDate(isoString: string) {
@@ -129,9 +203,7 @@ const nextHolidayDateMeta = computed(() => {
 
 <template>
   <div class="flex flex-col gap-6 animate-in fade-in slide-in-from-right-8 duration-300">
-    <!-- Top Layout: Profile/Action + Quick Metrics -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <!-- Profile & Main Action (8 cols) -->
       <div class="lg:col-span-8">
         <EmployeeProfileHeader
             :current-role="props.currentRole"
@@ -143,7 +215,6 @@ const nextHolidayDateMeta = computed(() => {
         />
       </div>
       
-      <!-- Next Special Date Highlight (4 cols) -->
       <div class="lg:col-span-4 flex" :class="props.currentRole !== 'EMPLOYEE' ? 'lg:pt-9' : ''">
         <div v-if="hasHoliday" class="bg-linear-to-br from-indigo-600 to-indigo-700 rounded-3xl p-6 shadow-lg text-white relative overflow-hidden group w-full h-full">
           <div class="absolute -right-4 -top-4 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-colors pointer-events-none"></div>
@@ -174,7 +245,6 @@ const nextHolidayDateMeta = computed(() => {
       </div>
     </div>
 
-    <!-- Secondary Summary Cards -->
     <EmployeeSummaryCards
         :is-loading="summaryStore.isLoadingSummary"
         :summary="summaryStore.employeeSummary"
@@ -182,13 +252,10 @@ const nextHolidayDateMeta = computed(() => {
         mode="compact"
     />
 
-    <!-- Main Grid -->
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
 
-      <!-- Left Column: Main Charts (Col 1-9) -->
       <div class="col-span-12 xl:col-span-8 2xl:col-span-9 flex flex-col gap-6">
 
-        <!-- Weekly Activity & Insights Row -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div class="lg:col-span-8 h-full">
              <WeeklyEvolutionChart :data="summaryStore.weeklySummary" class="h-full" />
@@ -241,15 +308,24 @@ const nextHolidayDateMeta = computed(() => {
           </div>
         </div>
 
-        <!-- Bottom Row: Yearly Evolution -->
         <YearlyEvolutionChart
-            :data="summaryStore.yearlySummary"
+            :data="chartData as any"
             :available-years="summaryStore.availableYears"
             v-model="selectedYear"
-            :title="t.dashboard.yearlyEvolutionBaseline"
+            :selected-month="selectedMonth"
+            :title="chartTitle"
+            @select-month="handleSelectMonth"
         >
           <template #actions>
             <div class="flex items-center gap-2">
+              <button
+                v-if="isDrillDown"
+                @click="resetDrillDown"
+                class="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-bold rounded-xl hover:bg-gray-200 transition-colors flex items-center gap-2"
+              >
+                <ChevronLeft :size="14" />
+                {{ t.dashboard.backToCompany }}
+              </button>
               <div class="w-36">
                 <BaseSelect v-model="selectedMonth" :options="monthOptions" />
               </div>
@@ -258,7 +334,6 @@ const nextHolidayDateMeta = computed(() => {
         </YearlyEvolutionChart>
       </div>
 
-      <!-- Right Column: Timeline (Col 10-12) -->
       <div class="col-span-12 xl:col-span-4 2xl:col-span-3 flex flex-col gap-6">
         <TimeDistributionPieChart
           v-if="hasTimeDistribution && summaryStore.employeeTimeDistribution"
