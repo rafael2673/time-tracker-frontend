@@ -4,6 +4,7 @@ import { Loader2, Trash2, Pencil, X } from 'lucide-vue-next'
 import { useLocale } from '~/composables/useLocale'
 import { useEmployeesStore } from '~/stores/employees'
 import ConfirmModal from '~/components/molecules/ConfirmModal.vue'
+import BaseDatePicker from '~/components/atoms/BaseDatePicker.vue'
 
 const props = defineProps<{
   isOpen: boolean
@@ -96,14 +97,14 @@ async function executeDelete() {
             <X :size="14" />
           </button>
 
-          <div class="grid grid-cols-2 gap-4">
-            <div class="space-y-1.5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="space-y-1.5 relative z-30">
               <label class="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">{{ t.employees.leaveStart }}</label>
-              <input v-model="formData.startDate" type="date" required class="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/50" />
+              <BaseDatePicker v-model="formData.startDate" />
             </div>
-            <div class="space-y-1.5">
+            <div class="space-y-1.5 relative z-30">
               <label class="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">{{ t.employees.leaveEnd }}</label>
-              <input v-model="formData.endDate" type="date" required class="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/50" />
+              <BaseDatePicker v-model="formData.endDate" />
             </div>
           </div>
           <div class="space-y-1.5">

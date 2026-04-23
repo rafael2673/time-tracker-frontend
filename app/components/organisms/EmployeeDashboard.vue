@@ -33,7 +33,7 @@ const selectedMonth = ref<number>(now.getMonth() + 1)
 const isDrillDown = ref(false)
 
 const drillDownChartData = computed(() => {
-  return summaryStore.weeklySummary.map(d => ({
+  return summaryStore.employeeDailyAverage.map(d => ({
     month: 0,
     monthName: d.day,
     workedHours: d.hours,
@@ -122,6 +122,7 @@ watch([selectedYear, selectedMonth, isDrillDown], async () => {
     const monthParam = isDrillDown.value ? selectedMonth.value : undefined
     if (monthParam) {
       await summaryStore.fetchEmployeeTimeDistribution(employeeId, selectedYear.value, monthParam)
+      await summaryStore.fetchEmployeeDailyAverage(employeeId, selectedYear.value, monthParam)
     } else {
       const currentMonth = new Date().getMonth() + 1
       await summaryStore.fetchEmployeeTimeDistribution(employeeId, selectedYear.value, currentMonth)
@@ -145,6 +146,10 @@ async function carregarDados(employeeId: string) {
     summaryStore.fetchNextHoliday(employeeId),
     summaryStore.fetchEmployeeTimeDistribution(employeeId, selectedYear.value, monthParam)
   ])
+
+  if (isDrillDown.value) {
+    await summaryStore.fetchEmployeeDailyAverage(employeeId, selectedYear.value, selectedMonth.value)
+  }
 }
 
 function handleSelectMonth(monthIdx: number) {
@@ -238,10 +243,11 @@ const nextHolidayDateMeta = computed(() => {
             </div>
           </div>
         </div>
-        <div v-else class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-3xl p-6 shadow-sm flex flex-col justify-center w-full h-full">
+        <div v-else class="flex-1 w-full bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-3xl p-5 shadow-sm flex flex-col items-center justify-center text-center">
           <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">{{ t.dashboard.nextHoliday }}</span>
-          <p class="text-base font-bold text-gray-900 dark:text-white mt-2">Sem data especial futura</p>
+          <p class="text-base font-bold text-gray-900 dark:text-white mt-2">{{ t.dashboard.noFutureSpecialDate }}</p>
         </div>
+
       </div>
     </div>
 
@@ -324,7 +330,7 @@ const nextHolidayDateMeta = computed(() => {
                 class="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-bold rounded-xl hover:bg-gray-200 transition-colors flex items-center gap-2"
               >
                 <ChevronLeft :size="14" />
-                {{ t.dashboard.backToCompany }}
+                {{ t.dashboard.backToYearly }}
               </button>
               <div class="w-36">
                 <BaseSelect v-model="selectedMonth" :options="monthOptions" />

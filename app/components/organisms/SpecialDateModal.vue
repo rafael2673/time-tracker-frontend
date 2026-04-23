@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import { useLocale } from '~/composables/useLocale'
-import { Loader2, Calendar as CalendarIcon, FileText, Percent, Info } from 'lucide-vue-next'
+import { Loader2, FileText, Percent, Info } from 'lucide-vue-next'
 import BaseSelect from '~/components/atoms/BaseSelect.vue'
+import BaseDatePicker from '~/components/atoms/BaseDatePicker.vue'
 
 const TYPE_COMPENSATORY = 'COMPENSATORY_COLLECTIVE'
 
@@ -86,21 +87,11 @@ function handleSubmit() {
       </div>
 
       <form @submit.prevent="handleSubmit" class="p-6 space-y-5">
-        <div class="space-y-1.5">
+        <div class="space-y-1.5 relative z-60">
           <label class="text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 ml-1">
             {{ t.calendar.date }}
           </label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-              <CalendarIcon :size="16" />
-            </div>
-            <input
-                v-model="formData.date"
-                type="date"
-                required
-                class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-medium"
-            />
-          </div>
+          <BaseDatePicker v-model="formData.date" />
         </div>
 
         <div class="space-y-1.5">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
-import { Users, Briefcase, Clock, Activity, Building2, ChevronLeft } from 'lucide-vue-next'
+import { Users, Clock, Building2, ChevronLeft, TrendingDown, ClipboardCheck } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth'
 import { useWorkspaceStore } from '~/stores/workspaces'
 import { useEmployeesStore } from '~/stores/employees'
@@ -13,7 +13,7 @@ import { formatDecimalHours } from '~/utils/timeFormatter'
 import YearlyEvolutionChart from '~/components/organisms/YearlyEvolutionChart.vue'
 import AbsencePieChart from '~/components/organisms/AbsencePieChart.vue'
 import TimeDistributionPieChart from '~/components/organisms/TimeDistributionPieChart.vue'
-import LaborRiskRanking from '~/components/organisms/LaborRiskRanking.vue'
+import OvertimeRanking from '~/components/organisms/OvertimeRanking.vue'
 import BaseSelect from '~/components/atoms/BaseSelect.vue'
 
 const props = defineProps<{
@@ -34,6 +34,12 @@ const selectedMonth = ref(now.getMonth() + 1)
 const selectedPolicy = ref('')
 const isDrillDown = ref(false)
 
+const chartTitle = computed(() => {
+  return isDrillDown.value 
+    ? t.value.dashboard.monthlyEvolutionCompany 
+    : t.value.dashboard.yearlyEvolutionCompany
+})
+
 const STORAGE_KEY = 'companyDashboard_drillDown'
 
 const activeWorkspaceName = computed(() => {
@@ -43,7 +49,7 @@ const activeWorkspaceName = computed(() => {
 
 const policyOptions = computed(() => {
   const options = policiesStore.policies.map(p => ({ value: p.id, label: p.name }))
-  return [{ value: '', label: (t.value.dashboard as any).filterByPolicy || 'Todas as Políticas' }, ...options]
+  return [{ value: '', label: t.value.dashboard.filterByPolicy }, ...options]
 })
 
 onMounted(() => {
@@ -80,6 +86,8 @@ watch([selectedYear, selectedPolicy], () => {
 
 watch([selectedYear, selectedMonth, isDrillDown], () => {
   const monthParam = isDrillDown.value ? selectedMonth.value : undefined
+  summaryStore.fetchCompanyBalance(selectedYear.value, monthParam)
+  
   if (monthParam) {
     summaryStore.fetchCompanyAbsences(selectedYear.value, monthParam)
     summaryStore.fetchTimeDistribution(selectedYear.value, monthParam)
@@ -105,12 +113,15 @@ function loadData() {
   approvalsStore.fetchPending(0)
   summaryStore.fetchAvailableYears()
   
-  const monthParam = isDrillDown.value ? selectedMonth.value : new Date().getMonth() + 1
+  const monthParam = isDrillDown.value ? selectedMonth.value : undefined
+  summaryStore.fetchCompanyBalance(selectedYear.value, monthParam)
+  
+  const currentMonth = monthParam || new Date().getMonth() + 1
 
-  summaryStore.fetchCompanyAbsences(selectedYear.value, monthParam)
-  summaryStore.fetchTimeDistribution(selectedYear.value, monthParam)
-  summaryStore.fetchLaborRiskRanking(selectedYear.value, monthParam)
-  summaryStore.fetchMonthlyBalance(selectedYear.value, monthParam)
+  summaryStore.fetchCompanyAbsences(selectedYear.value, currentMonth)
+  summaryStore.fetchTimeDistribution(selectedYear.value, currentMonth)
+  summaryStore.fetchLaborRiskRanking(selectedYear.value, currentMonth)
+  summaryStore.fetchMonthlyBalance(selectedYear.value, currentMonth)
   
   summaryStore.fetchCompanyYearlyAverage(selectedYear.value)
   if (isDrillDown.value) {
@@ -172,39 +183,43 @@ function getRoleTranslation(role: string): string {
 
       <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between transition-all hover:shadow-md">
         <div class="flex items-start justify-between mb-4">
-          <div class="p-3 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-2xl w-fit">
-            <Briefcase :size="24" />
-          </div>
-        </div>
-        <div>
-          <h3 class="text-3xl font-bold text-gray-900 dark:text-white tabular-nums">{{ policiesStore.policies.length }}</h3>
-          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{{ t.dashboard.policies }}</p>
-        </div>
-      </div>
-
-      <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between transition-all hover:shadow-md" :class="summaryStore.isLoadingSummary ? 'opacity-60' : ''">
-        <div class="flex items-start justify-between mb-4">
           <div class="p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-2xl w-fit">
             <Clock :size="24" />
           </div>
         </div>
         <div>
-          <h3 class="text-3xl font-bold tabular-nums" :class="summaryStore.monthlyBalance?.balance && summaryStore.monthlyBalance.balance < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'">
-            {{ summaryStore.monthlyBalance ? formatDecimalHours(summaryStore.monthlyBalance.balance) : '--h' }}
+          <h3 class="text-3xl font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
+            {{ summaryStore.companyBalance ? formatDecimalHours(summaryStore.companyBalance.totalLaborRisk) : '--h' }}
           </h3>
-          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{{ t.dashboard.hourBalance }}</p>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{{ t.dashboard.laborRisk }}</p>
         </div>
       </div>
 
       <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between transition-all hover:shadow-md">
         <div class="flex items-start justify-between mb-4">
           <div class="p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-2xl w-fit">
-            <Activity :size="24" />
+            <TrendingDown :size="24" />
           </div>
         </div>
         <div>
-          <h3 class="text-3xl font-bold text-gray-900 dark:text-white tabular-nums">{{ approvalsStore.totalElements }}</h3>
-          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{{ t.dashboard.pending }}</p>
+          <h3 class="text-3xl font-bold text-amber-600 dark:text-amber-400 tabular-nums">
+            {{ summaryStore.companyBalance ? formatDecimalHours(summaryStore.companyBalance.totalDeficit) : '--h' }}
+          </h3>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{{ t.dashboard.operationalDeficit }}</p>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between transition-all hover:shadow-md">
+        <div class="flex items-start justify-between mb-4">
+          <div class="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-2xl w-fit">
+            <ClipboardCheck :size="24" />
+          </div>
+        </div>
+        <div>
+          <h3 class="text-3xl font-bold text-gray-900 dark:text-white tabular-nums">
+            {{ summaryStore.companyBalance?.pendingActions ?? '--' }}
+          </h3>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{{ t.dashboard.pendingActions }}</p>
         </div>
       </div>
     </div>
@@ -216,7 +231,7 @@ function getRoleTranslation(role: string): string {
             :available-years="summaryStore.availableYears"
             v-model="selectedYear"
             :selected-month="selectedMonth"
-            :title="(isDrillDown ? (t.dashboard as any).monthlyEvolutionCompany : (t.dashboard as any).yearlyEvolutionCompany) || 'Evolução'"
+            :title="chartTitle"
             @select-month="handleSelectMonth"
             class="border-none shadow-none rounded-none"
         >
@@ -253,12 +268,15 @@ function getRoleTranslation(role: string): string {
     </div>
 
     <div class="mb-8" v-if="summaryStore.laborRiskRanking">
-      <LaborRiskRanking :ranking="summaryStore.laborRiskRanking" />
+      <OvertimeRanking :ranking="summaryStore.laborRiskRanking" />
     </div>
 
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-8 shadow-sm">
       <div class="flex items-center justify-between mb-8">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">{{ t.dashboard.employees }}</h2>
+        <NuxtLink to="/employees" class="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+          {{ t.dashboard.viewAllEmployees }}
+        </NuxtLink>
       </div>
 
       <div v-if="employeesStore.members.length === 0" class="text-center py-12">
@@ -266,7 +284,7 @@ function getRoleTranslation(role: string): string {
       </div>
 
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <div v-for="member in employeesStore.members" :key="member.id" @click="props.onSelectEmployee(member.id)" class="p-5 bg-gray-50 dark:bg-gray-800/30 rounded-3xl border border-gray-100 dark:border-gray-800 hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-md transition-all cursor-pointer group flex flex-col h-full overflow-hidden">
+        <div v-for="member in employeesStore.members.slice(0, 8)" :key="member.id" @click="props.onSelectEmployee(member.id)" class="p-5 bg-gray-50 dark:bg-gray-800/30 rounded-3xl border border-gray-100 dark:border-gray-800 hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-md transition-all cursor-pointer group flex flex-col h-full overflow-hidden">
           <div class="flex items-start justify-between mb-4 gap-3">
             <div class="w-12 h-12 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center font-bold text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors shadow-sm text-base shrink-0">
               {{ getInitials(member.fullName) }}

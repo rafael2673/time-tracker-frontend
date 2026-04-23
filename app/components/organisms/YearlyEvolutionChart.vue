@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import { Loader2, Calendar } from 'lucide-vue-next'
 import type { MonthSummaryResponse } from '~/stores/summary'
 import { useLocale } from "~/composables/useLocale"
@@ -24,18 +24,24 @@ const { t } = useLocale()
 const chartContainer = ref<HTMLElement | null>(null)
 const width = ref(800)
 const height = 240
-const padding = { top: 30, right: 20, bottom: 30, left: 40 }
+const padding = { top: 30, right: 40, bottom: 30, left: 40 }
 
 const hoveredIndex = ref<number | null>(null)
 
-onMounted(() => {
+function updateWidth() {
   if (chartContainer.value) {
     width.value = chartContainer.value.clientWidth
-    window.addEventListener('resize', () => {
-      if (chartContainer.value) width.value = chartContainer.value.clientWidth
-    })
   }
+}
+
+onMounted(() => {
+  updateWidth()
+  window.addEventListener('resize', updateWidth)
 })
+
+watch(() => props.data, () => {
+  setTimeout(updateWidth, 100)
+}, { deep: true })
 
 const maxHours = computed(() => {
   if (!props.data || props.data.length === 0) return 1
@@ -106,7 +112,7 @@ function isSelected(index: number) {
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-3xl p-6 shadow-sm w-full" ref="chartContainer">
+  <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-3xl p-6 shadow-sm w-full">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
       <h3 class="text-lg font-bold text-gray-900 dark:text-white tracking-tight">
         <template v-if="title">{{ title }}</template>
@@ -124,7 +130,7 @@ function isSelected(index: number) {
       </div>
     </div>
 
-    <div v-if="data && data.length > 0" class="relative w-full overflow-hidden" :style="{ height: `${height}px` }">
+    <div v-if="data && data.length > 0" class="relative w-full" :style="{ height: `${height}px` }" ref="chartContainer">
 
       <div v-if="hoveredIndex !== null && data[hoveredIndex]"
            class="absolute z-50 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] font-bold px-2 py-1.5 rounded shadow-lg pointer-events-none transform -translate-x-1/2 whitespace-nowrap flex flex-col items-center"

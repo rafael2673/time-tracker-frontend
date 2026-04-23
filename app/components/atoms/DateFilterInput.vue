@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { Calendar } from 'lucide-vue-next'
+import BaseDatePicker from './BaseDatePicker.vue'
 
 const props = defineProps<{
   modelValue: string
@@ -27,13 +27,10 @@ watch(() => props.modelValue, (newVal) => {
 </script>
 
 <template>
-  <div class="relative w-full sm:w-40 shrink-0">
-    <Calendar :size="16" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-    <input
+  <div class="w-full sm:w-48 shrink-0">
+    <BaseDatePicker
         v-model="localValue"
-        type="text"
-        :placeholder="props.placeholder || 'DD/MM/AAAA'"
-        class="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-medium transition-all h-42px"
+        :placeholder="props.placeholder"
     />
   </div>
 </template>

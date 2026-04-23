@@ -64,6 +64,12 @@ export interface TimeDistributionResponse {
     totalExpectedHours: number
 }
 
+export interface CompanyBalanceSummaryResponse {
+    totalLaborRisk: number
+    totalDeficit: number
+    pendingActions: number
+}
+
 export const useSummaryStore = defineStore('summary', () => {
     const authStore = useAuthStore()
     const { locale } = useLocale()
@@ -83,6 +89,40 @@ export const useSummaryStore = defineStore('summary', () => {
     const timeDistribution = ref<TimeDistributionResponse | null>(null)
     const employeeTimeDistribution = ref<TimeDistributionResponse | null>(null)
     const companyDailyAverage = ref<DailySummaryResponse[]>([])
+    const companyBalance = ref<CompanyBalanceSummaryResponse | null>(null)
+    const employeeDailyAverage = ref<DailySummaryResponse[]>([])
+
+    async function fetchCompanyBalance(year?: number, month?: number) {
+        if (!authStore.activeWorkspaceId) return
+        try {
+            let url = '/api/v1/summary/company/balance'
+            const params = new URLSearchParams()
+            if (year) params.append('year', year.toString())
+            if (month) params.append('month', month.toString())
+            const queryString = params.toString()
+            if (queryString) url += `?${queryString}`
+
+            companyBalance.value = await api<CompanyBalanceSummaryResponse>(url, {
+                headers: { 'X-Workspace-Id': authStore.activeWorkspaceId }
+            })
+        } catch (error) {
+            companyBalance.value = null
+        }
+    }
+
+    async function fetchEmployeeDailyAverage(employeeId: string, year: number, month: number) {
+        if (!authStore.activeWorkspaceId) return
+        try {
+            employeeDailyAverage.value = await api<DailySummaryResponse[]>(`/api/v1/summary/employee/${employeeId}/daily-average?year=${year}&month=${month}`, {
+                headers: {
+                    'X-Workspace-Id': authStore.activeWorkspaceId,
+                    'Accept-Language': locale.value
+                }
+            })
+        } catch (error) {
+            employeeDailyAverage.value = []
+        }
+    }
 
     async function fetchEmployeeTimeDistribution(employeeId: string, year: number, month: number) {
         if (!authStore.activeWorkspaceId) return
@@ -261,6 +301,8 @@ export const useSummaryStore = defineStore('summary', () => {
         nextHoliday,
         employeeTimeDistribution,
         companyDailyAverage,
+        companyBalance,
+        employeeDailyAverage,
         fetchEmployeeSummary,
         fetchEmployeeTimeDistribution,
         fetchMonthlyBalance,
@@ -272,6 +314,8 @@ export const useSummaryStore = defineStore('summary', () => {
         fetchCompanyYearlyAverage,
         fetchLaborRiskRanking,
         fetchTimeDistribution,
-        fetchCompanyDailyAverage
+        fetchCompanyDailyAverage,
+        fetchCompanyBalance,
+        fetchEmployeeDailyAverage
     }
 })

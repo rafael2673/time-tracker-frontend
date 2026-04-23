@@ -42,7 +42,7 @@ function getRoleTranslation(role: string): string {
         <div class="min-w-0">
           <div class="flex items-center gap-2">
             <p class="font-bold text-gray-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" :class="{'line-through decoration-gray-400': !props.member.active}">{{ props.member.fullName }}</p>
-            <span v-if="!props.member.active" class="px-1.5 py-0.5 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 text-[8px] font-bold rounded uppercase tracking-widest">{{ t.employees.inactive || 'Inativo' }}</span>
+            <span v-if="!props.member.active" class="px-1.5 py-0.5 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 text-[8px] font-bold rounded uppercase tracking-widest">{{ (t.employees as any).inactive || 'Inativo' }}</span>
           </div>
           <p class="text-xs font-medium text-gray-500 dark:text-gray-400 truncate">{{ props.member.email }}</p>
         </div>
