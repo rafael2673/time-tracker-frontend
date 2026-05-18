@@ -35,6 +35,11 @@ const navigation = computed(() => [
   { name: t.value.navigation.closures, href: '/closures', icon: Lock },
 ])
 
+const systemAdminNavigation = computed(() => [
+  { name: 'SaaS Dashboard', href: '/system-admin', icon: LayoutDashboard },
+  { name: 'Workspaces', href: '/system-admin/workspaces', icon: Building2 },
+])
+
 const currentRole = computed(() => {
   const ws = workspaceStore.workspaces.find(w => w.id === authStore.activeWorkspaceId)
   return ws?.role || 'EMPLOYEE'
@@ -99,6 +104,17 @@ function toggleSidebar() {
           :is-sidebar-collapsed="isSidebarCollapsed"
           :visible-navigation="visibleNavigation"
       />
+
+      <!-- System Admin Section -->
+      <div v-if="authStore.isSystemAdmin" class="mt-auto border-t border-gray-100 dark:border-gray-800 pt-4 pb-6">
+        <div v-if="!isSidebarCollapsed" class="px-8 mb-2">
+          <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Administração SaaS</span>
+        </div>
+        <MainSidebarNavigation
+            :is-sidebar-collapsed="isSidebarCollapsed"
+            :visible-navigation="systemAdminNavigation"
+        />
+      </div>
     </aside>
 
     <div class="md:hidden fixed top-0 w-full h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-4 z-40">

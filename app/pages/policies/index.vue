@@ -27,6 +27,7 @@ type PolicyFormData = {
   overtimeStrategy: string
   maxBankHoursPerMonth: number
   bankExpirationMonths: number
+  expirationModel: 'FIXED_CYCLE' | 'ROLLING_WINDOW'
   workingDays: string[]
 }
 
@@ -38,6 +39,7 @@ function createDefaultFormData(workingDays: string[] = []): PolicyFormData {
     overtimeStrategy: 'BANK_ONLY',
     maxBankHoursPerMonth: 0,
     bankExpirationMonths: 0,
+    expirationModel: 'FIXED_CYCLE',
     workingDays
   }
 }
@@ -84,6 +86,7 @@ function openEditModal(policy: WorkPolicy): void {
         overtimeStrategy: policy.overtimeStrategy,
         maxBankHoursPerMonth: policy.maxBankHoursPerMonth,
         bankExpirationMonths: policy.bankExpirationMonths,
+        expirationModel: policy.expirationModel,
         workingDays: policy.workingDays ? policy.workingDays.split(',') : []
     }
     errorMessage.value = ''
@@ -150,6 +153,7 @@ async function handleSubmit(): Promise<void> {
         overtimeStrategy: formData.value.overtimeStrategy,
         maxBankHoursPerMonth: Number(formData.value.maxBankHoursPerMonth),
         bankExpirationMonths: Number(formData.value.bankExpirationMonths),
+        expirationModel: formData.value.expirationModel,
         workingDays: formData.value.workingDays.join(',')
     }
 

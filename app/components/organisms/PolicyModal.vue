@@ -29,10 +29,21 @@ const strategyOptions = computed(() => [
   { value: 'MIXED', label: t.value.policies.strategyMixed }
 ])
 
+const expirationModelOptions = computed(() => [
+  { value: 'FIXED_CYCLE', label: t.value.policies.expirationModelFixed },
+  { value: 'ROLLING_WINDOW', label: t.value.policies.expirationModelRolling }
+])
+
 function getStrategyDescription(strategy: string): string {
   if (strategy === 'BANK_ONLY') return t.value.policies.descBankOnly
   if (strategy === 'PAY_ONLY') return t.value.policies.descPayOnly
   if (strategy === 'MIXED') return t.value.policies.descMixed
+  return ''
+}
+
+function getExpirationModelDescription(model: string): string {
+  if (model === 'FIXED_CYCLE') return t.value.policies.descExpirationFixed
+  if (model === 'ROLLING_WINDOW') return t.value.policies.descExpirationRolling
   return ''
 }
 </script>
@@ -112,6 +123,19 @@ function getStrategyDescription(strategy: string): string {
 
               </div>
               <input v-model.number="props.formData.bankExpirationMonths" type="number" min="0" required class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-medium" />
+            </div>
+          </div>
+
+          <div class="space-y-1.5" v-if="props.formData.overtimeStrategy !== 'PAY_ONLY' && props.formData.bankExpirationMonths > 0">
+            <label class="text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 ml-1">
+              {{ t.policies.expirationModelLabel }}
+            </label>
+            <BaseSelect
+                v-model="props.formData.expirationModel"
+                :options="expirationModelOptions"
+            />
+            <div class="mt-2 text-xs text-gray-600 dark:text-gray-400 bg-amber-50/50 dark:bg-amber-900/10 border-l-2 border-amber-400 dark:border-amber-500 pl-3 py-2 rounded-r-lg font-medium leading-relaxed">
+              {{ getExpirationModelDescription(props.formData.expirationModel) }}
             </div>
           </div>
 

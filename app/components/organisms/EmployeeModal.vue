@@ -68,6 +68,19 @@ function getRoleTranslation(role: string): string {
                     </select>
                 </div>
 
+                <div class="pt-2">
+                    <label class="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-all group">
+                        <div class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" v-model="props.formData.allowHomeOffice" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-sm font-bold text-gray-900 dark:text-white">{{ t.employees.allowHomeOfficeLabel }}</span>
+                            <span class="text-[10px] text-gray-500 font-medium uppercase tracking-tight">{{ t.employees.allowHomeOfficeDesc }}</span>
+                        </div>
+                    </label>
+                </div>
+
                 <div v-if="props.successMessage" class="p-3 text-xs font-bold text-green-700 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-100 dark:border-green-800/50">
                     {{ props.successMessage }}
                 </div>

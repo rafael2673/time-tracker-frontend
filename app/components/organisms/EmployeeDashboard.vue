@@ -10,7 +10,7 @@ import { formatDecimalHours } from '~/utils/timeFormatter'
 import EmployeeProfileHeader from '~/components/molecules/EmployeeProfileHeader.vue'
 import EmployeeSummaryCards from '~/components/molecules/EmployeeSummaryCards.vue'
 import YearlyEvolutionChart from '~/components/organisms/YearlyEvolutionChart.vue'
-import WeeklyEvolutionChart from '~/components/organisms/WeeklyEvolutionChart.vue'
+import WeeklyActivityChart from '~/components/organisms/WeeklyActivityChart.vue'
 import DailyRecordsTimeline from '~/components/organisms/DailyRecordsTimeline.vue'
 import TimeDistributionPieChart from '~/components/organisms/TimeDistributionPieChart.vue'
 import BaseSelect from '~/components/atoms/BaseSelect.vue'
@@ -264,7 +264,7 @@ const nextHolidayDateMeta = computed(() => {
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div class="lg:col-span-8 h-full">
-             <WeeklyEvolutionChart :data="summaryStore.weeklySummary" class="h-full" />
+             <WeeklyActivityChart :activity="summaryStore.employeeSummary?.weeklyActivity || []" class="h-full" />
           </div>
           
           <div class="lg:col-span-4 flex flex-col gap-6 h-full">

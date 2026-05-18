@@ -11,6 +11,7 @@ export interface WorkPolicy {
     overtimeStrategy: string
     maxBankHoursPerMonth: number
     bankExpirationMonths: number
+    expirationModel: 'FIXED_CYCLE' | 'ROLLING_WINDOW'
 }
 
 export interface WorkPolicyRequest {
@@ -21,6 +22,7 @@ export interface WorkPolicyRequest {
     overtimeStrategy: string
     maxBankHoursPerMonth: number
     bankExpirationMonths: number
+    expirationModel: 'FIXED_CYCLE' | 'ROLLING_WINDOW'
 }
 
 export const usePoliciesStore = defineStore('policies', () => {

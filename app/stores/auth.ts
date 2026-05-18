@@ -15,6 +15,7 @@ interface UserProfile {
     role: string
     workspaceId: string
     workspaceName: string
+    systemAdmin: boolean
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -25,6 +26,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     const router = useRouter()
 
+    const isSystemAdmin = computed(() => user.value?.systemAdmin || false)
     const isAdmin = computed(() => user.value?.role === 'ADMIN')
     const isManager = computed(() => user.value?.role === 'MANAGER' || user.value?.role === 'ADMIN')
 

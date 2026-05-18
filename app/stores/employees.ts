@@ -12,6 +12,7 @@ export interface WorkspaceMemberResponse {
     workPolicyId: string
     joinedAt: string
     active: boolean
+    allowHomeOffice: boolean
 }
 
 export interface AddMemberRequest {
@@ -19,12 +20,14 @@ export interface AddMemberRequest {
     fullName: string
     role: string
     workPolicyId: string
+    allowHomeOffice: boolean
 }
 
 export interface UpdateMemberRequest {
     fullName: string
     role: string
     workPolicyId: string
+    allowHomeOffice: boolean
 }
 
 export interface GenerateLinkCodeResponse {

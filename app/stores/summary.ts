@@ -12,6 +12,7 @@ export interface EmployeeDashboardSummary {
     unjustifiedAbsences: number
     pendingJustifications: number
     vacationDays: number
+    weeklyActivity: DailySummaryResponse[]
 }
 
 export interface MonthlyBalanceResponse {

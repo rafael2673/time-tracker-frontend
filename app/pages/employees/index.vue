@@ -34,7 +34,8 @@ const formData = ref<AddMemberRequest | UpdateMemberRequest>({
   email: '',
   fullName: '',
   role: 'EMPLOYEE',
-  workPolicyId: ''
+  workPolicyId: '',
+  allowHomeOffice: false
 })
 
 const currentRole = computed(() => {
@@ -88,11 +89,12 @@ function openModal(employee: any = null): void {
       fullName: employee.fullName,
       role: employee.role,
       workPolicyId: employee.workPolicyId,
-      email: employee.email
+      email: employee.email,
+      allowHomeOffice: employee.allowHomeOffice || false
     } as UpdateMemberRequest
   } else {
     editingId.value = null
-    formData.value = { email: '', fullName: '', role: 'EMPLOYEE', workPolicyId: '' } as AddMemberRequest
+    formData.value = { email: '', fullName: '', role: 'EMPLOYEE', workPolicyId: '', allowHomeOffice: false } as AddMemberRequest
   }
 
   isModalOpen.value = true
